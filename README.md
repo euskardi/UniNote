@@ -7,7 +7,6 @@ Original App Design Project - README Template
 1. [Overview](#Overview)
 1. [Product Spec](#Product-Spec)
 1. [Wireframes](#Wireframes)
-2. [Schema](#Schema)
 
 ## Overview
 ### Description
@@ -77,30 +76,29 @@ Updating below
 
 **Tab Navigation** (Tab to Screen)
 
-* [fill out your first tab]
-* [fill out your second tab]
-* [fill out your third tab]
+* Reminders
+* ToDo's
+* Shared Documents
+* User Settings
 
 **Flow Navigation** (Screen to Screen)
 
-* [list first screen here]
-   * [list screen navigation here]
-   * ...
-* [list second screen here]
-   * [list screen navigation here]
-   * ...
+* Login Screen
+   * ToDo's 
+* ToDo's Screen
+   * Edit/Create ToDo
+   * Share Document
+* Reminders Screen
+   * Edit/Create Reminder
+   * Share Document
+* Shared Documents Screen
+   * Edit Online Reminder
+   * Edit Online ToDo
+* Profile Screen
+   * Camera fragment
+ 
 
 ## Wireframes
-[Add picture of your hand sketched wireframes in this section]
-<img src="YOUR_WIREFRAME_IMAGE_URL" width=600>
+<img src="https://github.com/JesusU076/UniNote/blob/main/Wireframe.jpg" width=600>
 
-### [BONUS] Interactive Prototype
 
-## Schema 
-[This section will be completed in Unit 9]
-### Models
-[Add table of models]
-### Networking
-- [Add list of network requests by screen ]
-- [Create basic snippets for each Parse network request]
-- [OPTIONAL: List endpoints if using existing API such as Yelp]
