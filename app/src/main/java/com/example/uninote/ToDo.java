@@ -44,6 +44,5 @@ public class ToDo extends ParseObject {
     public void setImage(ParseFile parseFile){
         put(KEY_IMAGE, parseFile);
     }
-
 }
 
