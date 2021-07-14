@@ -3,14 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_todo"
+        android:id="@+id/action_reminder"
         android:icon="@drawable/ic_baseline_access_alarm_24"
-        android:title="ToDo's"
+        android:title="Reminders"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_reminder"
+        android:id="@+id/action_todo"
         android:icon="@drawable/ic_baseline_create_24"
-        android:title="Reminders"
+        android:title="ToDo"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_share"

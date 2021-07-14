@@ -8,6 +8,10 @@ import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.example.uninote.fragments.ProfileFragment;
+import com.example.uninote.fragments.ReminderFragment;
+import com.example.uninote.fragments.ShareFragment;
+import com.example.uninote.fragments.ToDoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,22 +31,22 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_todo:
-                        //fragment = new PostsFragment();
+                        fragment = new ToDoFragment();
                         break;
                     case R.id.action_reminder:
-                        //fragment = new ComposeFragment();
+                        fragment = new ReminderFragment();
                         break;
                     case R.id.action_share:
-                        //fragment = new ProfileFragment();
+                        fragment = new ShareFragment();
                         break;
                     case R.id.action_profile:
-                        //fragment = new ProfileFragment();
+                        fragment = new ProfileFragment();
                         break;
                     default:
-                        //fragment = new ComposeFragment();
+                        fragment = new ToDoFragment();
                         break;
                 }
-                //fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                 return true;
             }
         });
