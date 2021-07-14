@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical"
+    tools:context=".LoginActivity">
+
+    <TextView
+        android:id="@+id/Title"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_weight="3"
+        android:fontFamily="sans-serif-black"
+        android:text="UniNote"
+        android:textAlignment="center"
+        android:textSize="34sp"
+        android:typeface="sans" />
+
+    <EditText
+        android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="@string/username" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:backgroundTint="#62DEED"
+        android:text="@string/login"
+        android:textColor="@android:color/black"
+        app:cornerRadius="100dp" />
+
+    <Button
+        android:id="@+id/btnSignUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:backgroundTint="#5EDF63"
+        android:text="Sign Up"
+        android:textColor="@android:color/black"
+        app:cornerRadius="100dp" />
+
+</LinearLayout>
