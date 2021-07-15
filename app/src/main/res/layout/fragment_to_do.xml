@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeContent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.ToDoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvToDos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="ToDo" />
-
-</FrameLayout>
+        android:padding="8dp" />
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

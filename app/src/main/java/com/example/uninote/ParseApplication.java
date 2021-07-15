@@ -9,13 +9,11 @@ public class ParseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        ParseObject.registerSubclass(Reminder.class);
         ParseObject.registerSubclass(ToDo.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId(BuildConfig.APP_ID)
-                .clientKey(BuildConfig.CLIENT)
+                .applicationId("PTklUxQ065JbONoFbXYEkQPa6BsWjyYUuqxIWfC3")
+                .clientKey("p2jAsHWOD5Nt9II8vZQW02C11EFNdLqbijZRanel")
                 .server("https://parseapi.back4app.com")
                 .build()
         );

@@ -19,7 +19,7 @@ import com.parse.ParseUser;
 import org.jetbrains.annotations.NotNull;
 
 public class ProfileFragment extends Fragment {
-
+    final private static int FRAGMENT = R.layout.fragment_profile;
     private Button btnLogOut;
 
     public ProfileFragment() {
@@ -28,7 +28,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        return inflater.inflate(FRAGMENT, container, false);
     }
 
     @Override
