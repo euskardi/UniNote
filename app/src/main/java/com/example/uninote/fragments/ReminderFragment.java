@@ -1,5 +1,6 @@
 package com.example.uninote.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,9 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.uninote.R;
 import com.example.uninote.ReminderAdapter;
+import com.example.uninote.ReminderDetailActivity;
+import com.example.uninote.ToDoAdapter;
 import com.example.uninote.models.Reminder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -33,6 +38,7 @@ public class ReminderFragment extends Fragment {
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView rvReminders;
     private LinearLayoutManager mLayoutManager;
+    private ImageButton btnAdd;
     private ReminderAdapter adapter;
     private List<Reminder> allReminders;
 
@@ -48,12 +54,21 @@ public class ReminderFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        btnAdd = view.findViewById(R.id.btnAdd);
         rvReminders = view.findViewById(R.id.rvReminders);
         allReminders = new ArrayList<>();
         adapter = new ReminderAdapter(getContext(), allReminders);
         rvReminders.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvReminders.setLayoutManager(mLayoutManager);
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(), ReminderDetailActivity.class);
+                startActivity(i);
+            }
+        });
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContent);
 
@@ -65,6 +80,7 @@ public class ReminderFragment extends Fragment {
                 swipeContainer.setRefreshing(false);
             }
         });
+
 
         queryReminders();
     }
