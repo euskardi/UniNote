@@ -84,16 +84,18 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             final ParseGeoPoint location = reminder.getLocation();
             Geocoder geocoder = new Geocoder(context);
             List<Address> addresses = new ArrayList<>();
-            try {
-                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                //addresses = geocoder.getFromLocationName("Monterrey",1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (addresses.isEmpty()){
+            if (location == null || location.getLatitude() == 0){
                 tvLocation.setText(" ");
             }
-            else tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+            else {
+                try {
+                    addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                    //addresses = geocoder.getFromLocationName("Monterrey",1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+            }
 
         }
     }
