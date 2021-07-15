@@ -86,14 +86,15 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             List<Address> addresses = new ArrayList<>();
             try {
                 addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                addresses = geocoder.getFromLocationName("Monterrey",1);
+                //addresses = geocoder.getFromLocationName("Monterrey",1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
-                //Glide.with(context).load(reminder.getImage().getUrl()).into(ivImage);
+            if (addresses.isEmpty()){
+                tvLocation.setText(" ");
+            }
+            else tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
 
-            //else ivImage.setVisibility(View.GONE);
         }
     }
 }
