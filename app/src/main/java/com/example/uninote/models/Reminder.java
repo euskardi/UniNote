@@ -1,4 +1,4 @@
-package com.example.uninote;
+package com.example.uninote.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -12,7 +12,7 @@ import java.util.Date;
 public class Reminder extends ParseObject {
 
     public static final String KEY_TITLE = "Title";
-    public static final String KEY_DATE = "Date";
+    public static final String KEY_DATE = "Day";
     public static final String KEY_USER = "Username";
     public static final String KEY_LOCATION = "Location";
 

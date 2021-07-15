@@ -1,4 +1,4 @@
-package com.example.uninote;
+package com.example.uninote.models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;

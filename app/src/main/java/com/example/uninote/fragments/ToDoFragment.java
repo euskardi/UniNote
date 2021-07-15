@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.uninote.R;
-import com.example.uninote.ToDo;
+import com.example.uninote.models.ToDo;
 import com.example.uninote.ToDoAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
