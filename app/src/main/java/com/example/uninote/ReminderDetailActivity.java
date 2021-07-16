@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -155,12 +156,12 @@ public class ReminderDetailActivity extends AppCompatActivity {
     }
 
     private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location) {
-        final Reminder post = new Reminder();
-        post.setTitle(title);
-        post.setDate(date);
-        post.setLocation(location);
-        post.setUser(currentUser);
-        post.saveInBackground(new SaveCallback() {
+        final Reminder reminder = new Reminder();
+        reminder.setTitle(title);
+        reminder.setDate(date);
+        reminder.setLocation(location);
+        reminder.setUser(currentUser);
+        reminder.saveInBackground(new SaveCallback() {
             @Override
             public void done(com.parse.ParseException e) {
                 if (e != null){
@@ -174,5 +175,8 @@ public class ReminderDetailActivity extends AppCompatActivity {
                 etInputUbication.setText("");
             }
         });
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+        finish();
     }
 }
