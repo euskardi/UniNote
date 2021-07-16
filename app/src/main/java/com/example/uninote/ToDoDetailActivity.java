@@ -67,10 +67,6 @@ public class ToDoDetailActivity extends AppCompatActivity {
                     Toast.makeText(ToDoDetailActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (photoFile == null || ivPostImage.getDrawable() == null){
-                    Toast.makeText(ToDoDetailActivity.this, "There is no image", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 saveToDo(title, description, currentUser, photoFile);
             }
@@ -114,7 +110,9 @@ public class ToDoDetailActivity extends AppCompatActivity {
         final ToDo toDo = new ToDo();
         toDo.setTitle(title);
         toDo.setContent(description);
-        toDo.setImage(new ParseFile(photoFile));
+        if (photoFile != null && ivPostImage.getDrawable() != null){
+            toDo.setImage(new ParseFile(photoFile));
+        }
         toDo.setUser(currentUser);
         toDo.saveInBackground(new SaveCallback() {
             @Override
