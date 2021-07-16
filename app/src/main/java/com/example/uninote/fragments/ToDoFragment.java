@@ -1,5 +1,6 @@
 package com.example.uninote.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,8 +14,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.example.uninote.R;
+import com.example.uninote.ToDoDetailActivity;
 import com.example.uninote.models.ToDo;
 import com.example.uninote.ToDoAdapter;
 import com.parse.FindCallback;
@@ -32,6 +35,7 @@ public class ToDoFragment extends Fragment {
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView rvToDos;
     private LinearLayoutManager mLayoutManager;
+    private ImageButton btnAdd;
     private ToDoAdapter adapter;
     private List<ToDo> allToDos;
 
@@ -47,12 +51,21 @@ public class ToDoFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        btnAdd = view.findViewById(R.id.btnAdd);
         rvToDos = view.findViewById(R.id.rvToDos);
         allToDos = new ArrayList<>();
         adapter = new ToDoAdapter(getContext(), allToDos);
         rvToDos.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvToDos.setLayoutManager(mLayoutManager);
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(), ToDoDetailActivity.class);
+                startActivity(i);
+            }
+        });
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContent);
 

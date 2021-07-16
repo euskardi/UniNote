@@ -19,7 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UniNote">
-        <activity android:name=".ReminderDetailActivity"></activity>
+        <activity android:name=".ToDoDetailActivity"></activity>
+        <activity android:name=".ReminderDetailActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

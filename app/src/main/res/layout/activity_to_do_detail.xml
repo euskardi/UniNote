@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="true"
     android:orientation="vertical"
-    tools:context=".ReminderDetailActivity">
+    tools:context=".ToDoDetailActivity">
 
     <TextView
         android:id="@+id/Title"
@@ -13,7 +14,7 @@
         android:layout_height="52dp"
         android:layout_weight="3"
         android:fontFamily="sans-serif-black"
-        android:text="Create Reminder"
+        android:text="Create ToDo"
         android:textAlignment="center"
         android:textSize="34sp"
         android:typeface="sans" />
@@ -74,128 +75,70 @@
             android:layout_marginTop="7dp"
             android:layout_marginEnd="14dp"
             android:fontFamily="sans-serif-light"
-            android:text="Date:"
+            android:text="Description:"
             android:textSize="20sp" />
 
         <EditText
-            android:id="@+id/etInputDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/etInputDescription"
+            android:layout_width="367dp"
+            android:layout_height="156dp"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="-10dp"
-            android:layout_marginTop="0dp"
-            android:layout_toEndOf="@+id/tvDescriptionEdit"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="41dp"
             android:ems="10"
             android:fontFamily="sans-serif-light"
+            android:gravity="start"
             android:hint="Select day"
-            android:inputType="date"
+            android:inputType="textMultiLine"
+            android:textAlignment="textStart"
             android:textSize="17sp" />
-
-        <ImageButton
-            android:id="@+id/btnDate"
-            android:layout_width="41dp"
-            android:layout_height="34dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="-1dp"
-            android:layout_marginTop="4dp"
-            android:layout_toEndOf="@+id/etInputDate"
-            android:background="#00FFFFFF"
-            app:srcCompat="@android:drawable/ic_menu_my_calendar" />
 
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rlPhotoToDo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@+id/rlDescriptionToDo"
         android:layout_alignParentStart="true"
         android:layout_marginStart="0dp"
         android:layout_marginTop="3dp">
 
         <TextView
-            android:id="@+id/tvHourEdit"
+            android:id="@+id/tvPhotoEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="7dp"
+            android:layout_marginStart="13dp"
+            android:layout_marginTop="25dp"
             android:layout_marginEnd="14dp"
             android:fontFamily="sans-serif-light"
-            android:text="Hour:"
+            android:text="Photo:"
             android:textSize="20sp" />
 
-        <EditText
-            android:id="@+id/etInputHour"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="-10dp"
-            android:layout_marginTop="0dp"
-            android:layout_toEndOf="@+id/tvHourEdit"
-            android:ems="10"
-            android:fontFamily="sans-serif-light"
-            android:hint="HH:MM"
-            android:inputType="time" />
-
         <ImageButton
-            android:id="@+id/btnHour"
+            android:id="@+id/btnPhoto"
             android:layout_width="41dp"
             android:layout_height="34dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="-2dp"
-            android:layout_marginTop="6dp"
-            android:layout_toEndOf="@+id/etInputHour"
-            android:background="#00FFFFFF"
-            app:srcCompat="@android:drawable/ic_menu_recent_history" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rlUbicationReminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rlPhotoToDo"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="3dp">
-
-        <TextView
-            android:id="@+id/tvUbicationEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="7dp"
-            android:layout_marginEnd="14dp"
-            android:fontFamily="sans-serif-light"
-            android:text="Ubication:"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/etInputUbication"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="-10dp"
-            android:layout_marginTop="0dp"
-            android:layout_toEndOf="@+id/tvUbicationEdit"
-            android:ems="10"
-            android:fontFamily="sans-serif-light"
-            android:hint="Select ubication"
-            android:textSize="17sp" />
-
-        <ImageButton
-            android:id="@+id/btnUbication"
-            android:layout_width="41dp"
-            android:layout_height="34dp"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="-1dp"
-            android:layout_marginTop="4dp"
-            android:layout_toEndOf="@+id/etInputUbication"
+            android:layout_marginStart="116dp"
+            android:layout_marginTop="91dp"
             android:background="#00FFFFFF"
-            app:srcCompat="@android:drawable/ic_menu_mylocation" />
+            app:srcCompat="@android:drawable/ic_menu_camera" />
+
+        <ImageView
+            android:id="@+id/ivImageToDo"
+            android:layout_width="96dp"
+            android:layout_height="94dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="61dp"
+            app:srcCompat="@drawable/ic_baseline_account_circle_24"
+            tools:srcCompat="@tools:sample/avatars" />
 
     </RelativeLayout>
 
@@ -206,9 +149,10 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginStart="150dp"
         android:layout_marginEnd="150dp"
-        android:layout_marginBottom="162dp"
+        android:layout_marginBottom="30dp"
         android:gravity="center"
         android:text="Create"
         app:cornerRadius="100dp" />
