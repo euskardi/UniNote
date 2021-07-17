@@ -62,8 +62,7 @@ public class ToDoFragment extends Fragment {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getContext(), ToDoDetailActivity.class);
-                startActivity(i);
+                startActivity(new Intent(getContext(), ToDoDetailActivity.class));
             }
         });
 
@@ -77,7 +76,6 @@ public class ToDoFragment extends Fragment {
                 swipeContainer.setRefreshing(false);
             }
         });
-
         queryToDos();
     }
 
@@ -87,10 +85,10 @@ public class ToDoFragment extends Fragment {
         query.findInBackground(new FindCallback<ToDo>() {
             @Override
             public void done(List<ToDo> toDos, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting posts", e);
                 }
-                for (ToDo toDo : toDos){
+                for (ToDo toDo : toDos) {
                     Log.i(TAG, "ToDo is good " + toDo.getTitle());
                 }
                 allToDos.addAll(toDos);

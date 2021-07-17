@@ -26,7 +26,7 @@ import java.util.List;
 
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<Reminder> Reminders;
 
     public ReminderAdapter(Context context, List<Reminder> reminders) {
@@ -37,14 +37,12 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_reminder, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_reminder, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ReminderAdapter.ViewHolder holder, int position) {
-        Reminder reminder = Reminders.get(position);
-        holder.bind(reminder);
+        holder.bind(Reminders.get(position));
     }
 
     @Override
@@ -57,22 +55,18 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView tvTitle;
-        private TextView tvDate;
-        private TextView tvLocation;
-        private TextView tvTime;
-        //private ImageView ivImage;
-
+        private final TextView tvTitle;
+        private final TextView tvDate;
+        private final TextView tvLocation;
+        private final TextView tvTime;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvTime = itemView.findViewById(R.id.tvTime);
-            //ivImage = itemView.findViewById(R.id.ivImage);
-            //itemView.setOnClickListener(this);
             tvLocation = itemView.findViewById(R.id.tvLocation);
         }
 
@@ -82,21 +76,16 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             tvTime.setText(new SimpleDateFormat("HH:mm").format(reminder.getDate()));
 
             final ParseGeoPoint location = reminder.getLocation();
-            Geocoder geocoder = new Geocoder(context);
-            List<Address> addresses = new ArrayList<>();
-            if (location == null || location.getLatitude() == 0){
+            if (location.getLatitude() == 0 && location.getLongitude() == 0) {
                 tvLocation.setText(" ");
-            }
-            else {
+            } else {
                 try {
-                    addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                    //addresses = geocoder.getFromLocationName("Monterrey",1);
+                    final List<Address> addresses = new Geocoder(context).getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                    tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
             }
-
         }
     }
 }

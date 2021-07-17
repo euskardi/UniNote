@@ -17,7 +17,7 @@ public class ToDo extends ParseObject {
         return getString(KEY_TITLE);
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         put(KEY_TITLE, title);
     }
 
@@ -25,7 +25,7 @@ public class ToDo extends ParseObject {
         return getString(KEY_CONTENT);
     }
 
-    public void setContent(String content){
+    public void setContent(String content) {
         put(KEY_CONTENT, content);
     }
 
@@ -41,7 +41,7 @@ public class ToDo extends ParseObject {
         return getParseFile(KEY_IMAGE);
     }
 
-    public void setImage(ParseFile parseFile){
+    public void setImage(ParseFile parseFile) {
         put(KEY_IMAGE, parseFile);
     }
 }

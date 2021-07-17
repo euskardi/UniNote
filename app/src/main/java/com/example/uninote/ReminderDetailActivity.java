@@ -44,11 +44,11 @@ public class ReminderDetailActivity extends AppCompatActivity {
     private ImageButton btnHour;
     private ImageButton btnUbication;
     private Button btnCreateReminder;
-    DatePickerDialog.OnDateSetListener setListener;
-    Calendar calendar = Calendar.getInstance();
-    final int year = calendar.get(Calendar.YEAR);
-    final int month = calendar.get(Calendar.MONTH);
-    final int day = calendar.get(Calendar.DAY_OF_MONTH);
+    private DatePickerDialog.OnDateSetListener setListener;
+    private Calendar calendar = Calendar.getInstance();
+    private final int year = calendar.get(Calendar.YEAR);
+    private final int month = calendar.get(Calendar.MONTH);
+    private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private int hour, minute;
 
     @Override
@@ -99,18 +99,18 @@ public class ReminderDetailActivity extends AppCompatActivity {
         btnUbication.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Geocoder geocoder = new Geocoder(ReminderDetailActivity.this);
-                List<Address> addresses = new ArrayList<>();
+                final Geocoder geocoder = new Geocoder(ReminderDetailActivity.this);
+                final List<Address> addresses;
                 try {
-                    addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(),1);
+                    addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(), 1);
+                    if (addresses.isEmpty()) {
+                        etInputUbication.setText("");
+                        etInputUbication.setHint("Not Found");
+                    } else
+                        etInputUbication.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (addresses.isEmpty()){
-                    etInputUbication.setText("");
-                    etInputUbication.setHint("Not Found");
-                }
-                else etInputUbication.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
             }
         });
 
@@ -122,13 +122,13 @@ public class ReminderDetailActivity extends AppCompatActivity {
                 Geocoder geocoder = new Geocoder(ReminderDetailActivity.this);
                 List<Address> addresses = new ArrayList<>();
                 ParseGeoPoint location = new ParseGeoPoint();
-                
+
                 try {
-                    addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(),1);
+                    addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(), 1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                
+
                 try {
                     date = new SimpleDateFormat("dd/MM/yyyy").parse(etInputDate.getText().toString());
                     date.setHours(hour);
@@ -136,16 +136,16 @@ public class ReminderDetailActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                
-                if (!addresses.isEmpty()){
-                    location = new ParseGeoPoint(addresses.get(0).getLatitude(),addresses.get(0).getLongitude());
+
+                if (!addresses.isEmpty()) {
+                    location = new ParseGeoPoint(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
                 }
-                
-                if (title.isEmpty()){
+
+                if (title.isEmpty()) {
                     Toast.makeText(ReminderDetailActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (date == null){
+                if (date == null) {
                     Toast.makeText(ReminderDetailActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -164,7 +164,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
         reminder.saveInBackground(new SaveCallback() {
             @Override
             public void done(com.parse.ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Error while saving", e);
                     Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
                 }

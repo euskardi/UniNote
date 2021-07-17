@@ -48,7 +48,7 @@ public class ProfileFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         titleProfile.setText(currentUser.getString("username"));
         ParseFile image = currentUser.getParseFile("picture");
-        if (image != null){
+        if (image != null) {
             Glide.with(getContext()).load(currentUser.getParseFile("picture").getUrl()).into(ivProfile);
         }
 
@@ -62,7 +62,6 @@ public class ProfileFragment extends Fragment {
 
     private void logOutUser() {
         ParseUser.logOut();
-        Intent i = new Intent(getContext(), LoginActivity.class);
-        startActivity(i);
+        startActivity(new Intent(getContext(), LoginActivity.class));
     }
 }

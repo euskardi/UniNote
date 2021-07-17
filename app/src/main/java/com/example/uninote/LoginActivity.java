@@ -16,7 +16,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
-public class LoginActivity extends AppCompatActivity{
+public class LoginActivity extends AppCompatActivity {
 
     public static final String TAG = "LoginActivity";
 
@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        if (ParseUser.getCurrentUser() != null){
+        if (ParseUser.getCurrentUser() != null) {
             goMainActivity();
         }
 
@@ -42,18 +42,14 @@ public class LoginActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Log.i(TAG, "onClick login button");
-                String username = etUsername.getText().toString();
-                String password = etPassword.getText().toString();
-                loginUser(username, password);
+                loginUser(etUsername.getText().toString(), etPassword.getText().toString());
             }
         });
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = etUsername.getText().toString();
-                String password = etPassword.getText().toString();
-                signUpUser(username, password);
+                signUpUser(etUsername.getText().toString(), etPassword.getText().toString());
             }
         });
     }
@@ -66,11 +62,11 @@ public class LoginActivity extends AppCompatActivity{
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with login"+ username + " " + password, e);
+                    Log.e(TAG, "Issue with login" + username + " " + password, e);
                     Toast.makeText(LoginActivity.this, "Issue with Sign Up!", Toast.LENGTH_SHORT).show();
                     return;
-                }
-                else Toast.makeText(LoginActivity.this, "Sign Up Successfully", Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(LoginActivity.this, "Sign Up Successfully", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -80,8 +76,8 @@ public class LoginActivity extends AppCompatActivity{
         ParseUser.logInInBackground(username, password, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException e) {
-                if (e != null){
-                    Log.e(TAG, "Issue with login"+ username + " " + password, e);
+                if (e != null) {
+                    Log.e(TAG, "Issue with login" + username + " " + password, e);
                     Toast.makeText(LoginActivity.this, "Issue with login!", Toast.LENGTH_SHORT).show();
                     return;
                 }

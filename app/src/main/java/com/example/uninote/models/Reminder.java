@@ -20,7 +20,7 @@ public class Reminder extends ParseObject {
         return getString(KEY_TITLE);
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         put(KEY_TITLE, title);
     }
 
@@ -44,7 +44,7 @@ public class Reminder extends ParseObject {
         return getParseGeoPoint(KEY_LOCATION);
     }
 
-    public void setLocation(ParseGeoPoint location){
+    public void setLocation(ParseGeoPoint location) {
         put(KEY_LOCATION, location);
     }
 }

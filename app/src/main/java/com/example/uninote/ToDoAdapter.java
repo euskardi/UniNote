@@ -20,7 +20,7 @@ import java.util.List;
 
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<ToDo> toDos;
 
     public ToDoAdapter(Context context, List<ToDo> toDos) {
@@ -31,14 +31,12 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_todo, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_todo, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ToDoAdapter.ViewHolder holder, int position) {
-        ToDo toDo = toDos.get(position);
-        holder.bind(toDo);
+        holder.bind(toDos.get(position));
     }
 
     @Override
@@ -51,11 +49,11 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView tvTitle;
-        private TextView tvDescription;
-        private ImageView ivImage;
+        private final TextView tvTitle;
+        private final TextView tvDescription;
+        private final ImageView ivImage;
 
 
         public ViewHolder(@NonNull @NotNull View itemView) {
@@ -63,19 +61,15 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvDescription = itemView.findViewById(R.id.tvLocation);
             ivImage = itemView.findViewById(R.id.ivImage);
-            //itemView.setOnClickListener(this);
-
         }
 
         public void bind(ToDo toDo) {
             tvTitle.setText(toDo.getTitle());
-            //tvTime.setText(new SimpleDateFormat("MM/dd/yyyy").format(post.getUser().getCreatedAt()));
             tvDescription.setText(toDo.getContent());
             final ParseFile image = toDo.getImage();
-            if (image != null){
+            if (image != null) {
                 Glide.with(context).load(toDo.getImage().getUrl()).into(ivImage);
-            }
-            else ivImage.setVisibility(View.GONE);
+            } else ivImage.setVisibility(View.GONE);
         }
     }
 }

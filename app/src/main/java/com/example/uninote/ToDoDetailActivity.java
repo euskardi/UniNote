@@ -32,7 +32,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
 
     public static final String TAG = "ToDoUpload";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
-        private EditText etTitle;
+    private EditText etTitle;
     private EditText etDescription;
     private ImageButton btnCaptureImage;
     private ImageView ivPostImage;
@@ -63,7 +63,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final String title = etTitle.getText().toString();
                 final String description = etDescription.getText().toString();
-                if (description.isEmpty() || title.isEmpty()){
+                if (description.isEmpty() || title.isEmpty()) {
                     Toast.makeText(ToDoDetailActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -100,7 +100,7 @@ public class ToDoDetailActivity extends AppCompatActivity {
 
     private File getPhotoFileUri(String fileName) {
         File mediaStorageDir = new File(ToDoDetailActivity.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
@@ -110,14 +110,14 @@ public class ToDoDetailActivity extends AppCompatActivity {
         final ToDo toDo = new ToDo();
         toDo.setTitle(title);
         toDo.setContent(description);
-        if (photoFile != null && ivPostImage.getDrawable() != null){
+        if (photoFile != null && ivPostImage.getDrawable() != null) {
             toDo.setImage(new ParseFile(photoFile));
         }
         toDo.setUser(currentUser);
         toDo.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Error while saving", e);
                     Toast.makeText(ToDoDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
                 }

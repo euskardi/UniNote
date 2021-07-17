@@ -91,10 +91,10 @@ public class ReminderFragment extends Fragment {
         query.findInBackground(new FindCallback<Reminder>() {
             @Override
             public void done(List<Reminder> reminders, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting posts", e);
                 }
-                for (Reminder reminder : reminders){
+                for (Reminder reminder : reminders) {
                     Log.i(TAG, "ToDo is good " + reminder.getTitle());
                 }
                 allReminders.addAll(reminders);
