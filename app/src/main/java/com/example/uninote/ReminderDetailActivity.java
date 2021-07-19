@@ -103,13 +103,13 @@ public class ReminderDetailActivity extends AppCompatActivity {
                 final List<Address> addresses;
                 try {
                     addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(), 1);
-                    if (addresses.isEmpty()) {
-                        etInputUbication.setText("");
-                        etInputUbication.setHint("Not Found");
-                    } else
+                    etInputUbication.setText("");
+                    etInputUbication.setHint("Not Found");
+                    if (!addresses.isEmpty())
                         etInputUbication.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 } catch (IOException e) {
                     e.printStackTrace();
+
                 }
             }
         });
@@ -175,8 +175,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
                 etInputUbication.setText("");
             }
         });
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+        startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 }

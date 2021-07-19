@@ -87,14 +87,12 @@ public class ToDoDetailActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                ivPostImage.setVisibility(View.VISIBLE);
-                ivPostImage.setImageBitmap(takenImage);
-            } else {
-                Toast.makeText(ToDoDetailActivity.this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+            ivPostImage.setVisibility(View.VISIBLE);
+            ivPostImage.setImageBitmap(takenImage);
+        } else {
+            Toast.makeText(ToDoDetailActivity.this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -76,16 +76,15 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             tvTime.setText(new SimpleDateFormat("HH:mm").format(reminder.getDate()));
 
             final ParseGeoPoint location = reminder.getLocation();
-            if (location.getLatitude() == 0 && location.getLongitude() == 0) {
-                tvLocation.setText(" ");
-            } else {
-                try {
-                    final List<Address> addresses = new Geocoder(context).getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            try {
+                final List<Address> addresses = new Geocoder(context).getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                if (!addresses.isEmpty())
                     tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
         }
     }
 }
