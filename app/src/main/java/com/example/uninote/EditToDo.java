@@ -18,20 +18,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.uninote.models.ToDo;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.parceler.Parcels;
+
 import java.io.File;
 
-public class ToDoDetailActivity extends AppCompatActivity {
+public class EditToDo extends AppCompatActivity {
 
-    public static final String TAG = "ToDoUpload";
+    public static final String TAG = "ToDoEdit";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    private TextView tvName;
     private EditText etTitle;
     private EditText etDescription;
     private ImageButton btnCaptureImage;
@@ -45,18 +52,20 @@ public class ToDoDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_detail);
 
+        tvName = findViewById(R.id.Title);
         etTitle = findViewById(R.id.etInputTitleToDo);
         etDescription = findViewById(R.id.etInputDescription);
         btnCaptureImage = findViewById(R.id.btnPhoto);
         ivPostImage = findViewById(R.id.ivImageToDo);
         btnSubmit = findViewById(R.id.btnCreateToDo);
 
-        btnCaptureImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchCamera();
-            }
-        });
+        final ToDo toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
+
+        tvName.setText("Edit ToDo");
+        etTitle.setText(toDo.getTitle());
+        etDescription.setText(toDo.getContent());
+        Glide.with(this).load(toDo.getImage().getUrl()).into(ivPostImage);
+        btnSubmit.setText("EDIT");
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,11 +73,19 @@ public class ToDoDetailActivity extends AppCompatActivity {
                 final String title = etTitle.getText().toString();
                 final String description = etDescription.getText().toString();
                 if (description.isEmpty() || title.isEmpty()) {
-                    Toast.makeText(ToDoDetailActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditToDo.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                ParseUser currentUser = ParseUser.getCurrentUser();
-                saveToDo(title, description, currentUser, photoFile);
+                final ParseUser currentUser = ParseUser.getCurrentUser();
+
+                updateToDo(title, description, currentUser, photoFile, toDo);
+            }
+        });
+
+        btnCaptureImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchCamera();
             }
         });
     }
@@ -76,10 +93,10 @@ public class ToDoDetailActivity extends AppCompatActivity {
     private void launchCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         photoFile = getPhotoFileUri(photoFileName);
-        Uri fileProvider = FileProvider.getUriForFile(ToDoDetailActivity.this, "com.codepath.fileprovider.UniNote", photoFile);
+        Uri fileProvider = FileProvider.getUriForFile(EditToDo.this, "com.codepath.fileprovider.UniNote", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
-        if (intent.resolveActivity(ToDoDetailActivity.this.getPackageManager()) != null) {
+        if (intent.resolveActivity(EditToDo.this.getPackageManager()) != null) {
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         }
     }
@@ -92,36 +109,34 @@ public class ToDoDetailActivity extends AppCompatActivity {
             ivPostImage.setVisibility(View.VISIBLE);
             ivPostImage.setImageBitmap(takenImage);
         } else {
-            Toast.makeText(ToDoDetailActivity.this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(EditToDo.this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
         }
     }
 
     private File getPhotoFileUri(String fileName) {
-        File mediaStorageDir = new File(ToDoDetailActivity.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
+        File mediaStorageDir = new File(EditToDo.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
-    private void saveToDo(String title, String description, ParseUser currentUser, File photoFile) {
-        final ToDo toDo = new ToDo();
-        toDo.setTitle(title);
-        toDo.setContent(description);
-        if (photoFile != null && ivPostImage.getDrawable() != null) {
-            toDo.setImage(new ParseFile(photoFile));
-        }
-        toDo.setUser(currentUser);
-        toDo.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
-                    Toast.makeText(ToDoDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+
+    private void updateToDo(String title, String description, ParseUser currentUser, File photoFile, ToDo toDo) {
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
+        query.getInBackground(toDo.getObjectId());
+        query.getInBackground(toDo.getObjectId(), (object, e) -> {
+            if (e == null) {
+                object.put("Title", title);
+                object.put("Content", description);
+                if (photoFile != null && ivPostImage.getDrawable() != null) {
+                    object.put("Photo", new ParseFile(photoFile));
                 }
-                Log.i(TAG, "Post save was succesful!!");
-                etDescription.setText("");
-                ivPostImage.setImageResource(0);
+                object.put("Username", currentUser);
+                object.saveInBackground();
+
+            } else {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         startActivity(new Intent(this, MainActivity.class));

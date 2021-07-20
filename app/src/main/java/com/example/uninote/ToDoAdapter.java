@@ -1,6 +1,7 @@
 package com.example.uninote;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.example.uninote.models.ToDo;
 import com.parse.ParseFile;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -49,7 +51,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final TextView tvTitle;
         private final TextView tvDescription;
@@ -61,6 +63,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvDescription = itemView.findViewById(R.id.tvLocation);
             ivImage = itemView.findViewById(R.id.ivImage);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(ToDo toDo) {
@@ -70,6 +73,17 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             if (image != null) {
                 Glide.with(context).load(toDo.getImage().getUrl()).into(ivImage);
             } else ivImage.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void onClick(View v) {
+            final int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                ToDo toDo = toDos.get(position);
+                Intent intent = new Intent(context, EditToDo.class);
+                intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
+                context.startActivity(intent);
+            }
         }
     }
 }

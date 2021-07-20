@@ -19,7 +19,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UniNote">
-        <activity android:name=".ToDoDetailActivity"></activity>
+        <activity android:name=".EditReminder"></activity>
+        <activity android:name=".EditToDo" />
+        <activity android:name=".ToDoDetailActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -30,6 +32,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider" />
         </provider>
+
         <activity android:name=".ReminderDetailActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>

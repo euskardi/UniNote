@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -17,11 +16,16 @@ import android.widget.ImageButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ToDo;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
+
+import org.parceler.Parcels;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +37,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ReminderDetailActivity extends AppCompatActivity {
+public class EditReminder extends ReminderDetailActivity {
 
     public static final String TAG = "ReminderActivity";
     private EditText etTitle;
@@ -65,10 +69,27 @@ public class ReminderDetailActivity extends AppCompatActivity {
         btnUbication = findViewById(R.id.btnUbication);
         btnCreateReminder = findViewById(R.id.btnCreateReminder);
 
+        final Reminder reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
+
+        etTitle.setText(reminder.getTitle());
+        etInputDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(reminder.getDate()));
+        etInputHour.setText(new SimpleDateFormat("HH:mm").format(reminder.getDate()));
+        final ParseGeoPoint location = reminder.getLocation();
+        try {
+            final List<Address> addresses = new Geocoder(this).getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (!addresses.isEmpty())
+                etInputUbication.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        btnCreateReminder.setText("EDIT");
+
+
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(ReminderDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(EditReminder.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int day) {
                         month = month + 1;
@@ -91,7 +112,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
                         etInputHour.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
                     }
                 };
-                TimePickerDialog timePickerDialog = new TimePickerDialog(ReminderDetailActivity.this, onTimeSetListener, hour, minute, true);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(EditReminder.this, onTimeSetListener, hour, minute, true);
                 timePickerDialog.show();
             }
         });
@@ -99,7 +120,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
         btnUbication.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Geocoder geocoder = new Geocoder(ReminderDetailActivity.this);
+                final Geocoder geocoder = new Geocoder(EditReminder.this);
                 final List<Address> addresses;
                 try {
                     addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(), 1);
@@ -118,7 +139,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String title = etTitle.getText().toString();
                 Date date = new Date();
-                Geocoder geocoder = new Geocoder(ReminderDetailActivity.this);
+                Geocoder geocoder = new Geocoder(EditReminder.this);
                 List<Address> addresses = new ArrayList<>();
                 ParseGeoPoint location = new ParseGeoPoint();
 
@@ -141,40 +162,39 @@ public class ReminderDetailActivity extends AppCompatActivity {
                 }
 
                 if (title.isEmpty()) {
-                    Toast.makeText(ReminderDetailActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditReminder.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (date == null) {
-                    Toast.makeText(ReminderDetailActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditReminder.this, "Date cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
-                saveReminder(title, currentUser, date, location);
+                updateReminder(title, date, addresses, currentUser, reminder);
             }
         });
     }
 
-    private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location) {
-        final Reminder reminder = new Reminder();
-        reminder.setTitle(title);
-        reminder.setDate(date);
-        reminder.setLocation(location);
-        reminder.setUser(currentUser);
-        reminder.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(com.parse.ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
-                    Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-                }
-                Log.i(TAG, "Post save was succesful!!");
-                etTitle.setText("");
-                etInputDate.setText("");
-                etInputHour.setText("");
-                etInputUbication.setText("");
+    private void updateReminder(String title, Date date, List<Address> addresses, ParseUser currentUser, Reminder reminder) {
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Reminder");
+        query.getInBackground(reminder.getObjectId());
+        query.getInBackground(reminder.getObjectId(), (object, e) -> {
+            if (e == null) {
+                object.put("Title", title);
+                object.put("Day", date);
+                if (!addresses.isEmpty()) {
+                    object.put("Location", new ParseGeoPoint(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()));
+                } else object.put("Location", new ParseGeoPoint(0,0));
+                object.put("Username", currentUser);
+                object.saveInBackground();
+
+            } else {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
+
+
 }

@@ -1,6 +1,7 @@
 package com.example.uninote;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.view.LayoutInflater;
@@ -14,10 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ToDo;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -55,7 +58,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final TextView tvTitle;
         private final TextView tvDate;
@@ -68,6 +71,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             tvDate = itemView.findViewById(R.id.tvDate);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvLocation = itemView.findViewById(R.id.tvLocation);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Reminder reminder) {
@@ -85,6 +89,17 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
                 e.printStackTrace();
             }
 
+        }
+
+        @Override
+        public void onClick(View v) {
+            final int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Reminder reminder = Reminders.get(position);
+                Intent intent = new Intent(context, EditReminder.class);
+                intent.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
+                context.startActivity(intent);
+            }
         }
     }
 }
