@@ -1,6 +1,6 @@
 package com.example.uninote;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -16,18 +18,15 @@ import android.widget.ImageButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.uninote.models.Reminder;
-import com.example.uninote.models.ToDo;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,6 +53,7 @@ public class EditReminder extends ReminderDetailActivity {
     private final int month = calendar.get(Calendar.MONTH);
     private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private int hour, minute;
+    private Reminder reminder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +69,7 @@ public class EditReminder extends ReminderDetailActivity {
         btnUbication = findViewById(R.id.btnUbication);
         btnCreateReminder = findViewById(R.id.btnCreateReminder);
 
-        final Reminder reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
+        reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
 
         etTitle.setText(reminder.getTitle());
         etInputDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(reminder.getDate()));
@@ -171,6 +171,49 @@ public class EditReminder extends ReminderDetailActivity {
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 updateReminder(title, date, addresses, currentUser, reminder);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.delete:
+                deleteReminder(reminder);
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+
+            case R.id.cancel:
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void deleteReminder(Reminder reminder) {
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Reminder");
+        query.getInBackground(reminder.getObjectId(), (object, e) -> {
+            if (e == null) {
+                object.deleteInBackground(e2 -> {
+                    if(e2==null){
+                        Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
+                    }else{
+                        //Something went wrong while deleting the Object
+                        Toast.makeText(this, "Error: "+e2.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else{
+                Toast.makeText(this, "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

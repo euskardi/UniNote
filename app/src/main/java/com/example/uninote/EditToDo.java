@@ -1,5 +1,6 @@
 package com.example.uninote;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -13,6 +14,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -30,6 +34,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.io.File;
@@ -46,6 +51,7 @@ public class EditToDo extends AppCompatActivity {
     private Button btnSubmit;
     private File photoFile;
     public String photoFileName = "photo.jpg";
+    private ToDo toDo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +65,16 @@ public class EditToDo extends AppCompatActivity {
         ivPostImage = findViewById(R.id.ivImageToDo);
         btnSubmit = findViewById(R.id.btnCreateToDo);
 
-        final ToDo toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
+        toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
 
         tvName.setText("Edit ToDo");
         etTitle.setText(toDo.getTitle());
         etDescription.setText(toDo.getContent());
-        Glide.with(this).load(toDo.getImage().getUrl()).into(ivPostImage);
+        try {
+            Glide.with(this).load(toDo.getImage().getUrl()).into(ivPostImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         btnSubmit.setText("EDIT");
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +131,48 @@ public class EditToDo extends AppCompatActivity {
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete:
+                deleteToDo(toDo);
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+
+            case R.id.cancel:
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void deleteToDo(ToDo toDo) {
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
+        query.getInBackground(toDo.getObjectId(), (object, e) -> {
+            if (e == null) {
+                object.deleteInBackground(e2 -> {
+                    if (e2 == null) {
+                        Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
+                    } else {
+                        //Something went wrong while deleting the Object
+                        Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void updateToDo(String title, String description, ParseUser currentUser, File photoFile, ToDo toDo) {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
