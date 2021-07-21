@@ -79,8 +79,8 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         public void onClick(View v) {
             final int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                ToDo toDo = toDos.get(position);
-                Intent intent = new Intent(context, EditToDo.class);
+                final ToDo toDo = toDos.get(position);
+                final Intent intent = new Intent(context, EditToDo.class);
                 intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
                 context.startActivity(intent);
             }

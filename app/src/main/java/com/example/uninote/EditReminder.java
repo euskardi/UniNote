@@ -3,21 +3,20 @@ package com.example.uninote;
 import androidx.annotation.NonNull;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Reminder;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -34,9 +33,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-public class EditReminder extends ReminderDetailActivity {
+public class EditReminder extends ButtonsReminder {
 
     public static final String TAG = "ReminderActivity";
     private EditText etTitle;
@@ -52,7 +50,7 @@ public class EditReminder extends ReminderDetailActivity {
     private final int year = calendar.get(Calendar.YEAR);
     private final int month = calendar.get(Calendar.MONTH);
     private final int day = calendar.get(Calendar.DAY_OF_MONTH);
-    private int hour, minute;
+    private int hour, minutes;
     private Reminder reminder;
 
     @Override
@@ -85,61 +83,15 @@ public class EditReminder extends ReminderDetailActivity {
         }
         btnCreateReminder.setText("EDIT");
 
+        settingButtons(EditReminder.this);
 
-        btnDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(EditReminder.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {
-                        month = month + 1;
-                        String date = day + "/" + month + "/" + year;
-                        etInputDate.setText(date);
-                    }
-                }, year, month, day);
-                datePickerDialog.show();
-            }
-        });
-
-        btnHour.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minuteOfDay) {
-                        hour = hourOfDay;
-                        minute = minuteOfDay;
-                        etInputHour.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
-                    }
-                };
-                TimePickerDialog timePickerDialog = new TimePickerDialog(EditReminder.this, onTimeSetListener, hour, minute, true);
-                timePickerDialog.show();
-            }
-        });
-
-        btnUbication.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Geocoder geocoder = new Geocoder(EditReminder.this);
-                final List<Address> addresses;
-                try {
-                    addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(), 1);
-                    etInputUbication.setText("");
-                    etInputUbication.setHint("Not Found");
-                    if (!addresses.isEmpty())
-                        etInputUbication.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
 
         btnCreateReminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String title = etTitle.getText().toString();
+                final String title = etTitle.getText().toString();
+                final Geocoder geocoder = new Geocoder(EditReminder.this);
                 Date date = new Date();
-                Geocoder geocoder = new Geocoder(EditReminder.this);
                 List<Address> addresses = new ArrayList<>();
                 ParseGeoPoint location = new ParseGeoPoint();
 
@@ -151,8 +103,9 @@ public class EditReminder extends ReminderDetailActivity {
 
                 try {
                     date = new SimpleDateFormat("dd/MM/yyyy").parse(etInputDate.getText().toString());
-                    date.setHours(hour);
-                    date.setMinutes(minute);
+                    String[] parts = etInputHour.getText().toString().split(":");
+                    date.setHours(Integer.parseInt(parts[0]));
+                    date.setMinutes(Integer.parseInt(parts[1]));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -166,10 +119,10 @@ public class EditReminder extends ReminderDetailActivity {
                     return;
                 }
                 if (date == null) {
-                    Toast.makeText(EditReminder.this, "Date cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditReminder.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                ParseUser currentUser = ParseUser.getCurrentUser();
+                final ParseUser currentUser = ParseUser.getCurrentUser();
                 updateReminder(title, date, addresses, currentUser, reminder);
             }
         });
@@ -183,7 +136,7 @@ public class EditReminder extends ReminderDetailActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.delete:
                 deleteReminder(reminder);
                 startActivity(new Intent(this, MainActivity.class));
@@ -205,15 +158,15 @@ public class EditReminder extends ReminderDetailActivity {
         query.getInBackground(reminder.getObjectId(), (object, e) -> {
             if (e == null) {
                 object.deleteInBackground(e2 -> {
-                    if(e2==null){
+                    if (e2 == null) {
                         Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
-                    }else{
+                    } else {
                         //Something went wrong while deleting the Object
-                        Toast.makeText(this, "Error: "+e2.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-            }else{
-                Toast.makeText(this, "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -222,22 +175,17 @@ public class EditReminder extends ReminderDetailActivity {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Reminder");
         query.getInBackground(reminder.getObjectId());
         query.getInBackground(reminder.getObjectId(), (object, e) -> {
-            if (e == null) {
-                object.put("Title", title);
-                object.put("Day", date);
-                if (!addresses.isEmpty()) {
-                    object.put("Location", new ParseGeoPoint(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()));
-                } else object.put("Location", new ParseGeoPoint(0,0));
-                object.put("Username", currentUser);
-                object.saveInBackground();
-
+            object.put("Title", title);
+            object.put("Day", date);
+            if (!addresses.isEmpty()) {
+                object.put("Location", new ParseGeoPoint(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()));
             } else {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                object.put("Location", new ParseGeoPoint(0, 0));
             }
+            object.put("Username", currentUser);
+            object.saveInBackground();
         });
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
-
-
 }

@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Reminder;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -33,7 +34,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class ReminderDetailActivity extends AppCompatActivity {
+public class ReminderDetailActivity extends ButtonsReminder {
 
     public static final String TAG = "ReminderActivity";
     private EditText etTitle;
@@ -44,11 +45,6 @@ public class ReminderDetailActivity extends AppCompatActivity {
     private ImageButton btnHour;
     private ImageButton btnUbication;
     private Button btnCreateReminder;
-    private DatePickerDialog.OnDateSetListener setListener;
-    private Calendar calendar = Calendar.getInstance();
-    private final int year = calendar.get(Calendar.YEAR);
-    private final int month = calendar.get(Calendar.MONTH);
-    private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private int hour, minute;
 
     @Override
@@ -65,53 +61,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
         btnUbication = findViewById(R.id.btnUbication);
         btnCreateReminder = findViewById(R.id.btnCreateReminder);
 
-        btnDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(ReminderDetailActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int day) {
-                        month = month + 1;
-                        String date = day + "/" + month + "/" + year;
-                        etInputDate.setText(date);
-                    }
-                }, year, month, day);
-                datePickerDialog.show();
-            }
-        });
-
-        btnHour.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minuteOfDay) {
-                        hour = hourOfDay;
-                        minute = minuteOfDay;
-                        etInputHour.setText(String.format(Locale.getDefault(), "%02d:%02d", hour, minute));
-                    }
-                };
-                TimePickerDialog timePickerDialog = new TimePickerDialog(ReminderDetailActivity.this, onTimeSetListener, hour, minute, true);
-                timePickerDialog.show();
-            }
-        });
-
-        btnUbication.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Geocoder geocoder = new Geocoder(ReminderDetailActivity.this);
-                final List<Address> addresses;
-                try {
-                    addresses = geocoder.getFromLocationName(etInputUbication.getText().toString(), 1);
-                    etInputUbication.setText("");
-                    etInputUbication.setHint("Not Found");
-                    if (!addresses.isEmpty())
-                        etInputUbication.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        settingButtons(ReminderDetailActivity.this);
 
         btnCreateReminder.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,17 +1,7 @@
 package com.example.uninote;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
-
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.uninote.models.PhotoTaken;
 import com.example.uninote.models.ToDo;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -28,17 +19,14 @@ import com.parse.SaveCallback;
 
 import java.io.File;
 
-public class ToDoDetailActivity extends AppCompatActivity {
+public class ToDoDetailActivity extends PhotoTaken {
 
     public static final String TAG = "ToDoUpload";
-    public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     private EditText etTitle;
     private EditText etDescription;
     private ImageButton btnCaptureImage;
     private ImageView ivPostImage;
     private Button btnSubmit;
-    private File photoFile;
-    public String photoFileName = "photo.jpg";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +38,6 @@ public class ToDoDetailActivity extends AppCompatActivity {
         btnCaptureImage = findViewById(R.id.btnPhoto);
         ivPostImage = findViewById(R.id.ivImageToDo);
         btnSubmit = findViewById(R.id.btnCreateToDo);
-
-        btnCaptureImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                launchCamera();
-            }
-        });
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,37 +52,14 @@ public class ToDoDetailActivity extends AppCompatActivity {
                 saveToDo(title, description, currentUser, photoFile);
             }
         });
-    }
 
-    private void launchCamera() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        photoFile = getPhotoFileUri(photoFileName);
-        Uri fileProvider = FileProvider.getUriForFile(ToDoDetailActivity.this, "com.codepath.fileprovider.UniNote", photoFile);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
+        btnCaptureImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchCamera();
+            }
+        });
 
-        if (intent.resolveActivity(ToDoDetailActivity.this.getPackageManager()) != null) {
-            startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-            ivPostImage.setVisibility(View.VISIBLE);
-            ivPostImage.setImageBitmap(takenImage);
-        } else {
-            Toast.makeText(ToDoDetailActivity.this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private File getPhotoFileUri(String fileName) {
-        File mediaStorageDir = new File(ToDoDetailActivity.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
-            Log.d(TAG, "failed to create directory");
-        }
-        return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
     private void saveToDo(String title, String description, ParseUser currentUser, File photoFile) {
