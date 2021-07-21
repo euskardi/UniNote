@@ -45,7 +45,13 @@ public class ReminderDetailActivity extends ButtonsReminder {
     private ImageButton btnHour;
     private ImageButton btnUbication;
     private Button btnCreateReminder;
-    private int hour, minute;
+    private DatePickerDialog.OnDateSetListener setListener;
+    private Calendar calendar = Calendar.getInstance();
+    private final int year = calendar.get(Calendar.YEAR);
+    private final int month = calendar.get(Calendar.MONTH);
+    private final int day = calendar.get(Calendar.DAY_OF_MONTH);
+    private int hour, minutes;
+    private Reminder reminder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +86,9 @@ public class ReminderDetailActivity extends ButtonsReminder {
 
                 try {
                     date = new SimpleDateFormat("dd/MM/yyyy").parse(etInputDate.getText().toString());
-                    date.setHours(hour);
-                    date.setMinutes(minute);
+                    String[] parts = etInputHour.getText().toString().split(":");
+                    date.setHours(Integer.parseInt(parts[0]));
+                    date.setMinutes(Integer.parseInt(parts[1]));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -98,7 +105,7 @@ public class ReminderDetailActivity extends ButtonsReminder {
                     Toast.makeText(ReminderDetailActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                ParseUser currentUser = ParseUser.getCurrentUser();
+                final ParseUser currentUser = ParseUser.getCurrentUser();
                 saveReminder(title, currentUser, date, location);
             }
         });

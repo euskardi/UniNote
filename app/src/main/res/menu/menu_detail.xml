@@ -4,13 +4,18 @@
 
 
     <item
+        android:id="@+id/share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="Share"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/delete"
         android:icon="@android:drawable/ic_menu_delete"
-        android:title="Compose"
+        android:title="Delete"
         app:showAsAction="always" />
     <item
         android:id="@+id/cancel"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
-        android:title="Log Out"
+        android:title="Cancel"
         app:showAsAction="always" />
 </menu>

@@ -18,11 +18,13 @@ import android.widget.ImageButton;
 
 import com.example.uninote.R;
 import com.example.uninote.ToDoDetailActivity;
+import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
 import com.example.uninote.ToDoAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -80,8 +82,11 @@ public class ToDoFragment extends Fragment {
     }
 
     private void queryToDos() {
-        ParseQuery<ToDo> query = ParseQuery.getQuery(ToDo.class);
-        query.include(ToDo.KEY_USER);
+        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
+        innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        final ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
+        query.whereMatchesQuery("Username", innerQuery);
+
         query.findInBackground(new FindCallback<ToDo>() {
             @Override
             public void done(List<ToDo> toDos, ParseException e) {

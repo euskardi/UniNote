@@ -85,7 +85,6 @@ public class EditReminder extends ButtonsReminder {
 
         settingButtons(EditReminder.this);
 
-
         btnCreateReminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,10 +117,12 @@ public class EditReminder extends ButtonsReminder {
                     Toast.makeText(EditReminder.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 if (date == null) {
                     Toast.makeText(EditReminder.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 final ParseUser currentUser = ParseUser.getCurrentUser();
                 updateReminder(title, date, addresses, currentUser, reminder);
             }
@@ -137,6 +138,13 @@ public class EditReminder extends ButtonsReminder {
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.share:
+                final Intent intent = new Intent(this, ShareContent.class);
+                intent.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
+                startActivity(intent);
+                finish();
+                return true;
+
             case R.id.delete:
                 deleteReminder(reminder);
                 startActivity(new Intent(this, MainActivity.class));
@@ -161,7 +169,6 @@ public class EditReminder extends ButtonsReminder {
                     if (e2 == null) {
                         Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
                     } else {
-                        //Something went wrong while deleting the Object
                         Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -174,6 +181,7 @@ public class EditReminder extends ButtonsReminder {
     private void updateReminder(String title, Date date, List<Address> addresses, ParseUser currentUser, Reminder reminder) {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Reminder");
         query.getInBackground(reminder.getObjectId());
+
         query.getInBackground(reminder.getObjectId(), (object, e) -> {
             object.put("Title", title);
             object.put("Day", date);

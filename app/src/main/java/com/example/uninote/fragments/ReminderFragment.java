@@ -24,7 +24,9 @@ import com.example.uninote.ToDoAdapter;
 import com.example.uninote.models.Reminder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -80,25 +82,32 @@ public class ReminderFragment extends Fragment {
                 swipeContainer.setRefreshing(false);
             }
         });
-
-
         queryReminders();
     }
 
+    //COMMENT FOR ME: Needs to search a better form to get the data
     private void queryReminders() {
-        ParseQuery<Reminder> query = ParseQuery.getQuery(Reminder.class);
-        query.include(Reminder.KEY_USER);
-        query.findInBackground(new FindCallback<Reminder>() {
+        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
+        innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Reminder");
+        query.whereMatchesQuery("username", innerQuery);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<Reminder> reminders, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting posts", e);
+            public void done(List<ParseObject> reminders, ParseException e) {
+                for (ParseObject reminder : reminders) {
+                    Log.i(TAG, "Reminder is good " + reminder.getParseObject("reminder").getObjectId());
+                    final ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
+                    query.whereEqualTo("objectId", reminder.getParseObject("reminder").getObjectId());
+
+                    query.findInBackground(new FindCallback<Reminder>() {
+                        @Override
+                        public void done(List<Reminder> objects, ParseException e) {
+                            allReminders.addAll(objects);
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
                 }
-                for (Reminder reminder : reminders) {
-                    Log.i(TAG, "ToDo is good " + reminder.getTitle());
-                }
-                allReminders.addAll(reminders);
-                adapter.notifyDataSetChanged();
             }
         });
     }
