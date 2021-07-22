@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Reminder;
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -162,8 +164,28 @@ public class EditReminder extends ButtonsReminder {
     }
 
     private void deleteReminder(Reminder reminder) {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Reminder");
-        query.getInBackground(reminder.getObjectId(), (object, e) -> {
+        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("Reminder");
+        innerQuery.whereEqualTo("objectId", reminder.getObjectId());
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Reminder");
+        query.whereMatchesQuery("reminder", innerQuery);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                for (ParseObject object : objects) {
+                    object.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(com.parse.ParseException e) {
+                            if (e != null) {
+                                Toast.makeText(EditReminder.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        final ParseQuery<ParseObject> queryReminder = ParseQuery.getQuery("Reminder");
+        queryReminder.getInBackground(reminder.getObjectId(), (object, e) -> {
             if (e != null) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 return;

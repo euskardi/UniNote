@@ -19,8 +19,11 @@ import android.widget.Toast;
 
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Reminder;
+import com.parse.ParseACL;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -117,21 +120,38 @@ public class ReminderDetailActivity extends ButtonsReminder {
         reminder.setDate(date);
         reminder.setLocation(location);
         reminder.setUser(currentUser);
+
         reminder.saveInBackground(new SaveCallback() {
             @Override
             public void done(com.parse.ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
-                    Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+                if (e == null) {
                     return;
                 }
-                Log.i(TAG, "Post save was succesful!!");
-                etTitle.setText("");
-                etInputDate.setText("");
-                etInputHour.setText("");
-                etInputUbication.setText("");
+                Log.e(TAG, "Error while saving", e);
+                Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
             }
         });
+
+        final ParseObject entity = new ParseObject("User_Reminder");
+        final ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
+        parseACL.setPublicReadAccess(true);
+        ParseUser.getCurrentUser().setACL(parseACL);
+
+        entity.put("username", currentUser);
+        entity.put("reminder", reminder);
+
+        entity.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                if (e == null) {
+                    Log.i(TAG, "Post save was succesful!!");
+                    return;
+                }
+                Log.e(TAG, "Error while saving 2", e);
+                Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }

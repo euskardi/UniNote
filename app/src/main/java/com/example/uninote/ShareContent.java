@@ -24,13 +24,15 @@ import com.parse.SaveCallback;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ShareContent extends AppCompatActivity {
 
     public static final String TAG = "ShareContent";
     private final ArrayList<String> allUsers = new ArrayList<>();
-    private final ArrayList<ParseUser> allParseUsers = new ArrayList<>();
+    private final Map<String, ParseUser> allParseUsers = new HashMap<String, ParseUser>();
     private AutoCompleteTextView autoCompleteTextView;
     private TextView tvShareCode;
     private TextView tvUserName;
@@ -38,7 +40,7 @@ public class ShareContent extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private ParseUser userInfo;
     private Reminder reminder;
-
+    private ToDo toDo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +51,13 @@ public class ShareContent extends AppCompatActivity {
         tvUserName = findViewById(R.id.userId);
         btnAddUser = findViewById(R.id.btnAddUser);
 
+        toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
         reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
-        tvShareCode.setText(reminder.getObjectId());
+        if (toDo == null) {
+            tvShareCode.setText(reminder.getObjectId());
+        } else {
+            tvShareCode.setText(toDo.getObjectId());
+        }
 
         gettingUsers();
 
@@ -61,8 +68,8 @@ public class ShareContent extends AppCompatActivity {
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                tvUserName.setText(allParseUsers.get(position).getUsername());
-                userInfo = allParseUsers.get(position);
+                tvUserName.setText(adapter.getItem(position));
+                userInfo = allParseUsers.get(adapter.getItem(position));
             }
         });
 
@@ -81,7 +88,11 @@ public class ShareContent extends AppCompatActivity {
         }
         final ParseObject entity = new ParseObject("User_Reminder");
         entity.put("username", userInfo);
-        entity.put("reminder", reminder);
+        if (toDo == null) {
+            entity.put("reminder", reminder);
+        } else {
+            entity.put("toDo", toDo);
+        }
         entity.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -102,8 +113,8 @@ public class ShareContent extends AppCompatActivity {
                 for (ParseUser user : users) {
                     Log.i(TAG, "ToDo is good " + user.getUsername());
                     allUsers.add(user.getUsername());
+                    allParseUsers.put(user.getUsername(), user);
                 }
-                allParseUsers.addAll(users);
                 adapter.notifyDataSetChanged();
             }
         });
