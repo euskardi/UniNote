@@ -34,18 +34,19 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(FRAGMENT, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        final ParseUser currentUser = ParseUser.getCurrentUser();
         btnLogOut = view.findViewById(R.id.btnLogOut);
         titleProfile = view.findViewById(R.id.titleProfile);
         ivProfile = view.findViewById(R.id.ivProfile);
-        ParseUser currentUser = ParseUser.getCurrentUser();
+
         titleProfile.setText(currentUser.getString("username"));
         ParseFile image = currentUser.getParseFile("picture");
         if (image != null) {

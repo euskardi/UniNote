@@ -29,13 +29,13 @@ import java.util.List;
 public class ShareContent extends AppCompatActivity {
 
     public static final String TAG = "ShareContent";
+    private final ArrayList<String> allUsers = new ArrayList<>();
+    private final ArrayList<ParseUser> allParseUsers = new ArrayList<>();
     private AutoCompleteTextView autoCompleteTextView;
     private TextView tvShareCode;
     private TextView tvUserName;
     private ImageButton btnAddUser;
-    private ArrayList<String> allUsers = new ArrayList<>();
     private ArrayAdapter<String> adapter;
-    private ArrayList<ParseUser> allParseUsers = new ArrayList<>();
     private ParseUser userInfo;
     private Reminder reminder;
 
@@ -86,11 +86,9 @@ public class ShareContent extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
                     Toast.makeText(ShareContent.this, "Error while saving", Toast.LENGTH_SHORT).show();
                 }
                 Toast.makeText(ShareContent.this, "File Added", Toast.LENGTH_SHORT).show();
-
             }
         });
     }

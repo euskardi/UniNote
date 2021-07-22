@@ -48,7 +48,7 @@ public class ToDoDetailActivity extends PhotoTaken {
                     Toast.makeText(ToDoDetailActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                ParseUser currentUser = ParseUser.getCurrentUser();
+                final ParseUser currentUser = ParseUser.getCurrentUser();
                 saveToDo(title, description, currentUser, photoFile);
             }
         });

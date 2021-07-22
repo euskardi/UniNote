@@ -69,6 +69,7 @@ public class EditReminder extends ButtonsReminder {
 
         reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
 
+        btnCreateReminder.setText("EDIT");
         etTitle.setText(reminder.getTitle());
         etInputDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(reminder.getDate()));
         etInputHour.setText(new SimpleDateFormat("HH:mm").format(reminder.getDate()));
@@ -81,7 +82,6 @@ public class EditReminder extends ButtonsReminder {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        btnCreateReminder.setText("EDIT");
 
         settingButtons(EditReminder.this);
 
@@ -164,17 +164,17 @@ public class EditReminder extends ButtonsReminder {
     private void deleteReminder(Reminder reminder) {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("Reminder");
         query.getInBackground(reminder.getObjectId(), (object, e) -> {
-            if (e == null) {
-                object.deleteInBackground(e2 -> {
-                    if (e2 == null) {
-                        Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
+            if (e != null) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
             }
+            object.deleteInBackground(e2 -> {
+                if (e2 == null) {
+                    Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

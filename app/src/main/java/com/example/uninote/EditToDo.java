@@ -113,18 +113,17 @@ public class EditToDo extends PhotoTaken {
     private void deleteToDo(ToDo toDo) {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
         query.getInBackground(toDo.getObjectId(), (object, e) -> {
-            if (e == null) {
-                object.deleteInBackground(e2 -> {
-                    if (e2 == null) {
-                        Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
-                    } else {
-                        //Something went wrong while deleting the Object
-                        Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
+            if (e != null) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
             }
+            object.deleteInBackground(e2 -> {
+                if (e2 == null) {
+                    Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 
@@ -132,18 +131,17 @@ public class EditToDo extends PhotoTaken {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
         query.getInBackground(toDo.getObjectId());
         query.getInBackground(toDo.getObjectId(), (object, e) -> {
-            if (e == null) {
-                object.put("Title", title);
-                object.put("Content", description);
-                if (photoFile != null && ivPostImage.getDrawable() != null) {
-                    object.put("Photo", new ParseFile(photoFile));
-                }
-                object.put("Username", currentUser);
-                object.saveInBackground();
-
-            } else {
+            if (e != null) {
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
             }
+            object.put("Title", title);
+            object.put("Content", description);
+            if (photoFile != null && ivPostImage.getDrawable() != null) {
+                object.put("Photo", new ParseFile(photoFile));
+            }
+            object.put("Username", currentUser);
+            object.saveInBackground();
         });
         startActivity(new Intent(this, MainActivity.class));
         finish();

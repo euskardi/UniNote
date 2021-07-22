@@ -49,8 +49,7 @@ public class ButtonsReminder extends AppCompatActivity {
     private final int minutes = calendar.get(Calendar.MINUTE);
 
 
-
-    public void settingButtons(Context context){
+    public void settingButtons(Context context) {
         etTitle = findViewById(R.id.etInputTitle);
         etInputDate = findViewById(R.id.etInputDate);
         etInputHour = findViewById(R.id.etInputHour);
@@ -62,12 +61,11 @@ public class ButtonsReminder extends AppCompatActivity {
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
+                final DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int day) {
                         month = month + 1;
-                        String date = day + "/" + month + "/" + year;
-                        etInputDate.setText(date);
+                        etInputDate.setText(day + "/" + month + "/" + year);
                     }
                 }, year, month, day);
                 datePickerDialog.show();
@@ -77,10 +75,10 @@ public class ButtonsReminder extends AppCompatActivity {
         btnHour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
+                final TimePickerDialog timePickerDialog = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        etInputHour.setText(String.format( "%02d:%02d", hourOfDay, minute));
+                        etInputHour.setText(String.format("%02d:%02d", hourOfDay, minute));
                     }
                 }, year, minutes, true);
                 timePickerDialog.show();
@@ -103,6 +101,5 @@ public class ButtonsReminder extends AppCompatActivity {
                 }
             }
         });
-
     }
 }

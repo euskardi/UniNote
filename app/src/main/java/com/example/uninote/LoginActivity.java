@@ -62,11 +62,10 @@ public class LoginActivity extends AppCompatActivity {
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with login" + username + " " + password, e);
                     Toast.makeText(LoginActivity.this, "Issue with Sign Up!", Toast.LENGTH_SHORT).show();
                     return;
-                } else
-                    Toast.makeText(LoginActivity.this, "Sign Up Successfully", Toast.LENGTH_SHORT).show();
+                }
+                Toast.makeText(LoginActivity.this, "Sign Up Successfully", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -77,20 +76,17 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void done(ParseUser user, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "Issue with login" + username + " " + password, e);
                     Toast.makeText(LoginActivity.this, "Issue with login!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                goMainActivity();
                 Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
+                goMainActivity();
             }
         });
-
     }
 
     private void goMainActivity() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+        startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 }

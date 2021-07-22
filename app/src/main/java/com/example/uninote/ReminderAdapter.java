@@ -30,7 +30,7 @@ import java.util.List;
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHolder> {
 
     private final Context context;
-    private List<Reminder> Reminders;
+    private final List<Reminder> Reminders;
 
     public ReminderAdapter(Context context, List<Reminder> reminders) {
         this.context = context;
@@ -94,12 +94,13 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
         @Override
         public void onClick(View v) {
             final int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                Reminder reminder = Reminders.get(position);
-                Intent intent = new Intent(context, EditReminder.class);
-                intent.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
-                context.startActivity(intent);
+            if (position == RecyclerView.NO_POSITION) {
+                return;
             }
+            final Reminder reminder = Reminders.get(position);
+            final Intent intent = new Intent(context, EditReminder.class);
+            intent.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
+            context.startActivity(intent);
         }
     }
 }

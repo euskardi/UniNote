@@ -32,9 +32,9 @@ public class PhotoTaken extends AppCompatActivity {
 
     public void launchCamera() {
         ivPostImage = findViewById(R.id.ivImageToDo);
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        final Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         photoFile = getPhotoFileUri(photoFileName);
-        Uri fileProvider = FileProvider.getUriForFile(PhotoTaken.this, "com.codepath.fileprovider.UniNote", photoFile);
+        final Uri fileProvider = FileProvider.getUriForFile(PhotoTaken.this, "com.codepath.fileprovider.UniNote", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
         if (intent.resolveActivity(PhotoTaken.this.getPackageManager()) != null) {
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
@@ -42,7 +42,7 @@ public class PhotoTaken extends AppCompatActivity {
     }
 
     private File getPhotoFileUri(String fileName) {
-        File mediaStorageDir = new File(PhotoTaken.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
+        final File mediaStorageDir = new File(PhotoTaken.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }

@@ -37,6 +37,10 @@ import java.util.Locale;
 public class ReminderDetailActivity extends ButtonsReminder {
 
     public static final String TAG = "ReminderActivity";
+    private final Calendar calendar = Calendar.getInstance();
+    private final int year = calendar.get(Calendar.YEAR);
+    private final int month = calendar.get(Calendar.MONTH);
+    private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private EditText etTitle;
     private EditText etInputDate;
     private EditText etInputHour;
@@ -46,10 +50,6 @@ public class ReminderDetailActivity extends ButtonsReminder {
     private ImageButton btnUbication;
     private Button btnCreateReminder;
     private DatePickerDialog.OnDateSetListener setListener;
-    private Calendar calendar = Calendar.getInstance();
-    private final int year = calendar.get(Calendar.YEAR);
-    private final int month = calendar.get(Calendar.MONTH);
-    private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private int hour, minutes;
     private Reminder reminder;
 
@@ -72,7 +72,7 @@ public class ReminderDetailActivity extends ButtonsReminder {
         btnCreateReminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String title = etTitle.getText().toString();
+                final String title = etTitle.getText().toString();
                 Date date = new Date();
                 Geocoder geocoder = new Geocoder(ReminderDetailActivity.this);
                 List<Address> addresses = new ArrayList<>();
@@ -86,7 +86,7 @@ public class ReminderDetailActivity extends ButtonsReminder {
 
                 try {
                     date = new SimpleDateFormat("dd/MM/yyyy").parse(etInputDate.getText().toString());
-                    String[] parts = etInputHour.getText().toString().split(":");
+                    final String[] parts = etInputHour.getText().toString().split(":");
                     date.setHours(Integer.parseInt(parts[0]));
                     date.setMinutes(Integer.parseInt(parts[1]));
                 } catch (ParseException e) {
@@ -123,6 +123,7 @@ public class ReminderDetailActivity extends ButtonsReminder {
                 if (e != null) {
                     Log.e(TAG, "Error while saving", e);
                     Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 Log.i(TAG, "Post save was succesful!!");
                 etTitle.setText("");

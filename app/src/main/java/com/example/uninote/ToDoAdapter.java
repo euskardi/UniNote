@@ -23,7 +23,7 @@ import java.util.List;
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     private final Context context;
-    private List<ToDo> toDos;
+    private final List<ToDo> toDos;
 
     public ToDoAdapter(Context context, List<ToDo> toDos) {
         this.context = context;
@@ -57,7 +57,6 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         private final TextView tvDescription;
         private final ImageView ivImage;
 
-
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvTitle);
@@ -78,12 +77,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         @Override
         public void onClick(View v) {
             final int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                final ToDo toDo = toDos.get(position);
-                final Intent intent = new Intent(context, EditToDo.class);
-                intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
-                context.startActivity(intent);
+            if (position == RecyclerView.NO_POSITION) {
+                return;
             }
+            final ToDo toDo = toDos.get(position);
+            final Intent intent = new Intent(context, EditToDo.class);
+            intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
+            context.startActivity(intent);
         }
     }
 }
