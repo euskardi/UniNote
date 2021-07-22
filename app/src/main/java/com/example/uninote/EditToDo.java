@@ -16,7 +16,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.uninote.models.PhotoTaken;
+import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -26,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.util.List;
 
 public class EditToDo extends PhotoTaken {
 
@@ -94,6 +98,13 @@ public class EditToDo extends PhotoTaken {
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.share:
+                final Intent intent = new Intent(this, ShareContent.class);
+                intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
+                startActivity(intent);
+                finish();
+                return true;
+
             case R.id.delete:
                 deleteToDo(toDo);
                 startActivity(new Intent(this, MainActivity.class));
@@ -111,8 +122,28 @@ public class EditToDo extends PhotoTaken {
     }
 
     private void deleteToDo(ToDo toDo) {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
-        query.getInBackground(toDo.getObjectId(), (object, e) -> {
+        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("ToDo");
+        innerQuery.whereEqualTo("objectId", toDo.getObjectId());
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_ToDo");
+        query.whereMatchesQuery("toDo", innerQuery);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, com.parse.ParseException e) {
+                for (ParseObject object : objects) {
+                    object.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(com.parse.ParseException e) {
+                            if (e != null) {
+                                Toast.makeText(EditToDo.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        final ParseQuery<ParseObject> queryToDo = ParseQuery.getQuery("ToDo");
+        queryToDo.getInBackground(toDo.getObjectId(), (object, e) -> {
             if (e != null) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 return;
@@ -130,6 +161,7 @@ public class EditToDo extends PhotoTaken {
     private void updateToDo(String title, String description, ParseUser currentUser, File photoFile, ToDo toDo) {
         final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
         query.getInBackground(toDo.getObjectId());
+
         query.getInBackground(toDo.getObjectId(), (object, e) -> {
             if (e != null) {
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();

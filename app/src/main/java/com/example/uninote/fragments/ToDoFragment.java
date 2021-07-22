@@ -23,6 +23,7 @@ import com.example.uninote.models.ToDo;
 import com.example.uninote.ToDoAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -84,20 +85,25 @@ public class ToDoFragment extends Fragment {
     private void queryToDos() {
         final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
         innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
-        query.whereMatchesQuery("Username", innerQuery);
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_ToDo");
+        query.whereMatchesQuery("username", innerQuery);
 
-        query.findInBackground(new FindCallback<ToDo>() {
+        query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ToDo> toDos, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting posts", e);
+            public void done(List<ParseObject> toDos, ParseException e) {
+                for (ParseObject toDo : toDos) {
+                    Log.i(TAG, "ToDo is good " + toDo.getParseObject("toDo").getObjectId());
+                    final ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
+                    query.whereEqualTo("objectId", toDo.getParseObject("toDo").getObjectId());
+
+                    query.findInBackground(new FindCallback<ToDo>() {
+                        @Override
+                        public void done(List<ToDo> objects, ParseException e) {
+                            allToDos.addAll(objects);
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
                 }
-                for (ToDo toDo : toDos) {
-                    Log.i(TAG, "ToDo is good " + toDo.getTitle());
-                }
-                allToDos.addAll(toDos);
-                adapter.notifyDataSetChanged();
             }
         });
     }

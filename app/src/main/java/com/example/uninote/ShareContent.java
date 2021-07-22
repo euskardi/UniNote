@@ -86,13 +86,7 @@ public class ShareContent extends AppCompatActivity {
             Toast.makeText(this, "User can'' be empty", Toast.LENGTH_SHORT).show();
             return;
         }
-        final ParseObject entity = new ParseObject("User_Reminder");
-        entity.put("username", userInfo);
-        if (toDo == null) {
-            entity.put("reminder", reminder);
-        } else {
-            entity.put("toDo", toDo);
-        }
+        final ParseObject entity = entityType();
         entity.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -102,6 +96,19 @@ public class ShareContent extends AppCompatActivity {
                 Toast.makeText(ShareContent.this, "File Added", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private ParseObject entityType() {
+        if (toDo == null) {
+            final ParseObject entity = new ParseObject("User_Reminder");
+            entity.put("reminder", reminder);
+            entity.put("username", userInfo);
+            return entity;
+        }
+        final ParseObject entity = new ParseObject("User_ToDo");
+        entity.put("toDo", toDo);
+        entity.put("username", userInfo);
+        return entity;
     }
 
     private void gettingUsers() {

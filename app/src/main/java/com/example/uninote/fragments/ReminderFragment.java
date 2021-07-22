@@ -67,8 +67,7 @@ public class ReminderFragment extends Fragment {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getContext(), ReminderDetailActivity.class);
-                startActivity(i);
+                startActivity(new Intent(getContext(), ReminderDetailActivity.class));
             }
         });
 
