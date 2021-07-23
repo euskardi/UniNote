@@ -1,6 +1,7 @@
 package com.example.uninote;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.uninote.models.ToDo;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -71,7 +74,14 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-
+            final int position = getAdapterPosition();
+            if (position == RecyclerView.NO_POSITION) {
+                return;
+            }
+            final ParseUser parseUser = users.get(position);
+            final Intent intent = new Intent(context, ChatActivity.class);
+            intent.putExtra(ParseUser.class.getSimpleName(), Parcels.wrap(parseUser));
+            context.startActivity(intent);
         }
     }
 }

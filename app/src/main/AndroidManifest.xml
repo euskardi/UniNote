@@ -19,7 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UniNote">
-        <activity android:name=".ShareContent"></activity>
+        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".ShareContent" />
         <activity android:name=".EditReminder" />
         <activity android:name=".EditToDo" />
         <activity android:name=".ToDoDetailActivity" />
@@ -42,7 +43,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
