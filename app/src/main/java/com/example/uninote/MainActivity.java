@@ -13,6 +13,9 @@ import com.example.uninote.fragments.ReminderFragment;
 import com.example.uninote.fragments.ShareFragment;
 import com.example.uninote.fragments.ToDoFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.ParseACL;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity {
 

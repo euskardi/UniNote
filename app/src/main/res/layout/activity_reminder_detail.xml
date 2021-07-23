@@ -201,17 +201,102 @@
 
     <Button
         android:id="@+id/btnCreateReminder"
-        android:layout_width="100dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="150dp"
         android:layout_marginEnd="150dp"
-        android:layout_marginBottom="162dp"
+        android:layout_marginBottom="260dp"
         android:gravity="center"
         android:text="Create"
         app:cornerRadius="100dp" />
+
+    <RelativeLayout
+        android:id="@+id/shareReminder"
+        android:layout_width="match_parent"
+        android:layout_height="521dp"
+        android:layout_below="@+id/btnCreateReminder"
+        android:layout_marginTop="-260dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/title2"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="145dp"
+            android:layout_weight="3"
+            android:fontFamily="sans-serif-black"
+            android:text="Adding Share Code"
+            android:textAlignment="center"
+            android:textSize="34sp"
+            android:typeface="sans" />
+
+        <Button
+            android:id="@+id/btnLinkReminder"
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="27dp"
+            android:layout_marginBottom="66dp"
+            android:layout_toEndOf="@+id/rlShareCodeReminder"
+            android:gravity="center"
+            android:text="Link"
+            app:cornerRadius="100dp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="220dp"
+            android:text="or" />
+
+        <RelativeLayout
+            android:id="@+id/rlShareCodeReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="14dp"
+            android:layout_marginBottom="65dp">
+
+            <TextView
+                android:id="@+id/tvShareCodeReminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="19dp"
+                android:layout_marginEnd="14dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Code:"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etShareCodeReminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="-10dp"
+                android:layout_marginTop="12dp"
+                android:layout_toEndOf="@id/tvShareCodeReminder"
+                android:ems="10"
+                android:fontFamily="sans-serif-light"
+                android:hint="Number Code"
+                android:inputType="textPersonName"
+                android:textSize="17sp" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
 
 
 </RelativeLayout>

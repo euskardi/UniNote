@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -48,10 +49,12 @@ public class ReminderDetailActivity extends ButtonsReminder {
     private EditText etInputDate;
     private EditText etInputHour;
     private EditText etInputUbication;
+    private EditText etShareCode;
     private ImageButton btnDate;
     private ImageButton btnHour;
     private ImageButton btnUbication;
     private Button btnCreateReminder;
+    private Button btnShare;
     private DatePickerDialog.OnDateSetListener setListener;
     private int hour, minutes;
     private Reminder reminder;
@@ -61,16 +64,30 @@ public class ReminderDetailActivity extends ButtonsReminder {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_detail);
 
+        findViewById(R.id.shareReminder).setVisibility(View.VISIBLE);
         etTitle = findViewById(R.id.etInputTitle);
         etInputDate = findViewById(R.id.etInputDate);
         etInputHour = findViewById(R.id.etInputHour);
         etInputUbication = findViewById(R.id.etInputUbication);
+        etShareCode = findViewById(R.id.etShareCodeReminder);
         btnDate = findViewById(R.id.btnDate);
         btnHour = findViewById(R.id.btnHour);
         btnUbication = findViewById(R.id.btnUbication);
         btnCreateReminder = findViewById(R.id.btnCreateReminder);
+        btnShare = findViewById(R.id.btnLinkReminder);
 
         settingButtons(ReminderDetailActivity.this);
+
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (etShareCode.getText().toString().isEmpty()){
+                    Toast.makeText(ReminderDetailActivity.this, "Empty Code", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                linkReminder(etShareCode.getText().toString());
+            }
+        });
 
         btnCreateReminder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +129,33 @@ public class ReminderDetailActivity extends ButtonsReminder {
                 saveReminder(title, currentUser, date, location);
             }
         });
+    }
+
+    private void linkReminder(String code) {
+        final ParseObject entity = new ParseObject("User_Reminder");
+        entity.put("username", ParseUser.getCurrentUser());
+
+        ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
+        query.getInBackground(code, (object, e) -> {
+                if (e != null){
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                entity.put("reminder", object);
+                entity.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(com.parse.ParseException e) {
+                        if (e == null) {
+                            Log.i(TAG, "Link was successfully!!");
+                            return;
+                        }
+                        Log.e(TAG, "Error while saving 2", e);
+                        Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location) {
