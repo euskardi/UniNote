@@ -48,12 +48,12 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="1dp"
                 android:layout_marginEnd="20dp"
-                android:layout_toStartOf="@+id/buttonSend"
+                android:layout_toStartOf="@+id/btnSend"
                 android:fontFamily="sans-serif-black"
                 android:hint="Message" />
 
             <Button
-                android:id="@+id/buttonSend"
+                android:id="@+id/btnSend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
