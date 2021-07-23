@@ -14,8 +14,8 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/action_share"
-        android:icon="@drawable/ic_baseline_share_24"
-        android:title="Share"
+        android:icon="@drawable/ic_baseline_chat_24"
+        android:title="Talk"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_profile"
