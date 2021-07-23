@@ -81,7 +81,7 @@ public class ReminderDetailActivity extends ButtonsReminder {
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (etShareCode.getText().toString().isEmpty()){
+                if (etShareCode.getText().toString().isEmpty()) {
                     Toast.makeText(ReminderDetailActivity.this, "Empty Code", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -137,23 +137,23 @@ public class ReminderDetailActivity extends ButtonsReminder {
 
         ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
         query.getInBackground(code, (object, e) -> {
-                if (e != null){
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                entity.put("reminder", object);
-                entity.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(com.parse.ParseException e) {
-                        if (e == null) {
-                            Log.i(TAG, "Link was successfully!!");
-                            return;
-                        }
-                        Log.e(TAG, "Error while saving 2", e);
-                        Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+            if (e != null) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            entity.put("reminder", object);
+            entity.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(com.parse.ParseException e) {
+                    if (e == null) {
+                        Log.i(TAG, "Link was successfully!!");
+                        return;
                     }
-                });
+                    Log.e(TAG, "Error while saving 2", e);
+                    Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+                }
             });
+        });
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }

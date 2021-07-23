@@ -8,154 +8,252 @@
     android:orientation="vertical"
     tools:context=".ToDoDetailActivity">
 
-    <TextView
-        android:id="@+id/Title"
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_weight="3"
-        android:fontFamily="sans-serif-black"
-        android:text="Create ToDo"
-        android:textAlignment="center"
-        android:textSize="34sp"
-        android:typeface="sans" />
-
-    <RelativeLayout
-        android:id="@+id/rlTitleToDo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/Title"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="6dp">
+        android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/tvTitleEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="19dp"
-            android:layout_marginEnd="14dp"
-            android:fontFamily="sans-serif-light"
-            android:text="Title:"
-            android:textSize="20sp" />
+            android:id="@+id/Title"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_weight="3"
+            android:fontFamily="sans-serif-black"
+            android:text="Create ToDo"
+            android:textAlignment="center"
+            android:textSize="34sp"
+            android:typeface="sans" />
 
-        <EditText
-            android:id="@+id/etInputTitleToDo"
+        <RelativeLayout
+            android:id="@+id/rlTitleToDo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="-10dp"
-            android:layout_marginTop="12dp"
-            android:layout_toEndOf="@id/tvTitleEdit"
-            android:ems="10"
-            android:fontFamily="sans-serif-light"
-            android:hint="Title name"
-            android:inputType="textPersonName"
-            android:textSize="17sp" />
+            android:layout_below="@+id/Title"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:id="@+id/tvTitleEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="19dp"
+                android:layout_marginEnd="14dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Title:"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etInputTitleToDo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="-10dp"
+                android:layout_marginTop="12dp"
+                android:layout_toEndOf="@id/tvTitleEdit"
+                android:ems="10"
+                android:fontFamily="sans-serif-light"
+                android:hint="Title name"
+                android:inputType="textPersonName"
+                android:textSize="17sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlDescriptionToDo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rlTitleToDo"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="3dp">
+
+            <TextView
+                android:id="@+id/tvDescriptionEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginEnd="14dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Description:"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/etInputDescription"
+                android:layout_width="367dp"
+                android:layout_height="156dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="41dp"
+                android:ems="10"
+                android:fontFamily="sans-serif-light"
+                android:gravity="start"
+                android:hint="Select day"
+                android:inputType="textMultiLine"
+                android:textAlignment="textStart"
+                android:textSize="17sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlPhotoToDo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rlDescriptionToDo"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="3dp">
+
+            <Button
+                android:id="@+id/btnCreateToDo"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ivImageToDo"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="150dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="150dp"
+                android:gravity="center"
+                android:text="Create"
+                app:cornerRadius="100dp" />
+
+            <TextView
+                android:id="@+id/tvPhotoEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="13dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="14dp"
+                android:fontFamily="sans-serif-light"
+                android:text="Photo:"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/btnPhoto"
+                android:layout_width="41dp"
+                android:layout_height="34dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="116dp"
+                android:layout_marginTop="91dp"
+                android:background="#00FFFFFF"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+
+            <ImageView
+                android:id="@+id/ivImageToDo"
+                android:layout_width="96dp"
+                android:layout_height="94dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="61dp"
+                app:srcCompat="@drawable/ic_baseline_account_circle_24"
+                tools:srcCompat="@tools:sample/avatars" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/shareToDo"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_below="@+id/rlPhotoToDo"
+            android:visibility="gone">
+            android:layout_marginTop="-260dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/title2"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="145dp"
+                android:layout_weight="3"
+                android:fontFamily="sans-serif-black"
+                android:text="Adding Share Code"
+                android:textAlignment="center"
+                android:textSize="34sp"
+                android:typeface="sans" />
+
+            <Button
+                android:id="@+id/btnLinkToDo"
+                android:layout_width="99dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="27dp"
+                android:layout_marginBottom="66dp"
+                android:layout_toEndOf="@+id/rlShareCodeToDo"
+                android:gravity="center"
+                android:text="Link"
+                app:cornerRadius="100dp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="220dp"
+                android:text="or" />
+
+            <RelativeLayout
+                android:id="@+id/rlShareCodeToDo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="14dp"
+                android:layout_marginBottom="65dp">
+
+                <TextView
+                    android:id="@+id/tvShareCodeToDo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="19dp"
+                    android:layout_marginEnd="14dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="Code:"
+                    android:textSize="20sp" />
+
+                <EditText
+                    android:id="@+id/etShareCodeToDo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="-10dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_toEndOf="@id/tvShareCodeToDo"
+                    android:ems="10"
+                    android:fontFamily="sans-serif-light"
+                    android:hint="Number Code"
+                    android:inputType="textPersonName"
+                    android:textSize="17sp" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/rlDescriptionToDo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rlTitleToDo"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="3dp">
 
-        <TextView
-            android:id="@+id/tvDescriptionEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="7dp"
-            android:layout_marginEnd="14dp"
-            android:fontFamily="sans-serif-light"
-            android:text="Description:"
-            android:textSize="20sp" />
+</ScrollView>
 
-        <EditText
-            android:id="@+id/etInputDescription"
-            android:layout_width="367dp"
-            android:layout_height="156dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="41dp"
-            android:ems="10"
-            android:fontFamily="sans-serif-light"
-            android:gravity="start"
-            android:hint="Select day"
-            android:inputType="textMultiLine"
-            android:textAlignment="textStart"
-            android:textSize="17sp" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rlPhotoToDo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/rlDescriptionToDo"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="3dp">
-
-        <TextView
-            android:id="@+id/tvPhotoEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="13dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="14dp"
-            android:fontFamily="sans-serif-light"
-            android:text="Photo:"
-            android:textSize="20sp" />
-
-        <ImageButton
-            android:id="@+id/btnPhoto"
-            android:layout_width="41dp"
-            android:layout_height="34dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="116dp"
-            android:layout_marginTop="91dp"
-            android:background="#00FFFFFF"
-            app:srcCompat="@android:drawable/ic_menu_camera" />
-
-        <ImageView
-            android:id="@+id/ivImageToDo"
-            android:layout_width="96dp"
-            android:layout_height="94dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="61dp"
-            app:srcCompat="@drawable/ic_baseline_account_circle_24"
-            tools:srcCompat="@tools:sample/avatars" />
-
-    </RelativeLayout>
-
-    <Button
-        android:id="@+id/btnCreateToDo"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="150dp"
-        android:layout_marginEnd="150dp"
-        android:layout_marginBottom="30dp"
-        android:gravity="center"
-        android:text="Create"
-        app:cornerRadius="100dp" />
 
 
 </RelativeLayout>
