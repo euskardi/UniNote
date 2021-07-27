@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.uninote.fragments.ProfileFragment;
+import com.example.uninote.fragments.ProjectFragment;
 import com.example.uninote.fragments.ReminderFragment;
 import com.example.uninote.fragments.ShareFragment;
 import com.example.uninote.fragments.ToDoFragment;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                         fragment = new ReminderFragment();
                         break;
                     case R.id.action_share:
-                        fragment = new ShareFragment();
+                        fragment = new ProjectFragment();
                         break;
                     case R.id.action_profile:
                         fragment = new ProfileFragment();

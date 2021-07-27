@@ -3,6 +3,7 @@ package com.example.uninote;
 import android.app.Application;
 
 import com.example.uninote.models.Message;
+import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
 import com.parse.Parse;
@@ -15,6 +16,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(ToDo.class);
         ParseObject.registerSubclass(Reminder.class);
         ParseObject.registerSubclass(Message.class);
+        ParseObject.registerSubclass(Project.class);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
                 .applicationId(BuildConfig.APP_ID)
