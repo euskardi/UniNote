@@ -1,26 +1,24 @@
 package com.example.uninote.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.example.uninote.R;
-import com.example.uninote.ToDoDetailActivity;
+import com.example.uninote.ReminderAdapter;
+import com.example.uninote.ToDoAdapter;
+import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
-import com.example.uninote.ToDoAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -32,9 +30,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ToDoFragment extends Fragment {
 
-    public static final String TAG = "ToDosFragment";
+public class ToDoProjectFragment extends ToDoFragment {
+
+    public static final String TAG = "ToDoFragment";
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView rvToDos;
     private LinearLayoutManager mLayoutManager;
@@ -42,7 +41,7 @@ public class ToDoFragment extends Fragment {
     private ToDoAdapter adapter;
     private List<ToDo> allToDos;
 
-    public ToDoFragment() {
+    public ToDoProjectFragment() {
     }
 
     @Override
@@ -54,20 +53,18 @@ public class ToDoFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        final boolean typeOfLecture = viewType();
         btnAdd = view.findViewById(R.id.btnAdd);
         rvToDos = view.findViewById(R.id.rvToDos);
         allToDos = new ArrayList<>();
-        adapter = new ToDoAdapter(getContext(), allToDos, true);
+        adapter = new ToDoAdapter(getContext(), allToDos, viewType());
         rvToDos.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvToDos.setLayoutManager(mLayoutManager);
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getContext(), ToDoDetailActivity.class));
-            }
-        });
+        if (!typeOfLecture) {
+            btnAdd.setVisibility(View.GONE);
+        }
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContent);
 
@@ -82,28 +79,40 @@ public class ToDoFragment extends Fragment {
         queryToDos();
     }
 
-    private void queryToDos() {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
-        innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_ToDo");
-        query.whereMatchesQuery("username", innerQuery);
+    private boolean viewType() {
+        final Project project = getArguments().getParcelable("code");
+        final boolean[] type = new boolean[1];
+
+        final ParseQuery<ParseUser> innerQueryOne = ParseQuery.getQuery("_User");
+        innerQueryOne.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        final ParseQuery<ParseUser> innerQueryTwo = ParseQuery.getQuery("Project");
+        innerQueryTwo.whereEqualTo("objectId", project.getObjectId());
+
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Project");
+        query.whereMatchesQuery("username", innerQueryOne);
+        query.whereMatchesQuery("project", innerQueryTwo);
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> toDos, ParseException e) {
-                for (ParseObject toDo : toDos) {
-                    Log.i(TAG, "ToDo is good " + toDo.getParseObject("toDo").getObjectId());
-                    final ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
-                    query.whereEqualTo("objectId", toDo.getParseObject("toDo").getObjectId());
+            public void done(List<ParseObject> reminders, ParseException e) {
+                type[0] = reminders.get(0).getBoolean("type");
+            }
+        });
+        return type[0];
+    }
 
-                    query.findInBackground(new FindCallback<ToDo>() {
-                        @Override
-                        public void done(List<ToDo> objects, ParseException e) {
-                            allToDos.addAll(objects);
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
-                }
+    private void queryToDos() {
+        final Project project = getArguments().getParcelable("code");
+        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("Project");
+        innerQuery.whereEqualTo("objectId", project.getObjectId());
+        final ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
+        query.whereMatchesQuery("Project", innerQuery);
+
+        query.findInBackground(new FindCallback<ToDo>() {
+            @Override
+            public void done(List<ToDo> toDos, ParseException e) {
+                allToDos.addAll(toDos);
+                adapter.notifyDataSetChanged();
             }
         });
     }

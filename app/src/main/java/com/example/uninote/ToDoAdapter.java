@@ -24,10 +24,12 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     private final Context context;
     private final List<ToDo> toDos;
+    private final boolean click;
 
-    public ToDoAdapter(Context context, List<ToDo> toDos) {
+    public ToDoAdapter(Context context, List<ToDo> toDos, boolean click) {
         this.context = context;
         this.toDos = toDos;
+        this.click = click;
     }
 
     @NonNull
@@ -77,7 +79,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         @Override
         public void onClick(View v) {
             final int position = getAdapterPosition();
-            if (position == RecyclerView.NO_POSITION) {
+            if (position == RecyclerView.NO_POSITION || !click) {
                 return;
             }
             final ToDo toDo = toDos.get(position);

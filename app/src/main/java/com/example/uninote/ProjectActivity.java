@@ -15,6 +15,7 @@ import com.example.uninote.fragments.ReminderFragment;
 import com.example.uninote.fragments.ReminderProjectFragment;
 import com.example.uninote.fragments.ShareFragment;
 import com.example.uninote.fragments.ToDoFragment;
+import com.example.uninote.fragments.ToDoProjectFragment;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.ToDo;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -46,16 +47,12 @@ public class ProjectActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment;
                 switch (item.getItemId()) {
-                    case R.id.action_todo:
-                        fragment = new ToDoFragment();
-                        fragment.setArguments(args);
-                        break;
                     case R.id.action_reminder:
                         fragment = new ReminderProjectFragment();
                         fragment.setArguments(args);
                         break;
                     case R.id.action_directory:
-                        fragment = new ProjectFragment();
+                        fragment = new ShareFragment();
                         break;
                     case R.id.action_message:
                         fragment = new ProjectFragment();
@@ -64,7 +61,8 @@ public class ProjectActivity extends AppCompatActivity {
                         fragment = new ProfileFragment();
                         break;
                     default:
-                        fragment = new ToDoFragment();
+                        fragment = new ToDoProjectFragment();
+                        fragment.setArguments(args);
                         break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
