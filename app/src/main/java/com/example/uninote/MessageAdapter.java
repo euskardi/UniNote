@@ -69,7 +69,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         public void bind(Message message) {
             tvMessage.setText(message.getContent());
             try {
-                if (!message.getSender().fetchIfNeeded().getUsername().equals(ParseUser.getCurrentUser().getUsername())) {
+                final String messageUsername = message.getSender().fetchIfNeeded().getUsername();
+                if (!messageUsername.equals(ParseUser.getCurrentUser().getUsername())) {
                     Log.i(TAG, "My: ");
                     cdMessage.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
                 }

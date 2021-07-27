@@ -176,7 +176,9 @@ public class EditReminder extends ButtonsReminder {
                         @Override
                         public void done(com.parse.ParseException e) {
                             if (e != null) {
-                                Toast.makeText(EditReminder.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast
+                                  .makeText(EditReminder.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT)
+                                  .show();
                             }
                         }
                     });
