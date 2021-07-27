@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.uninote.fragments.MessageFragment;
 import com.example.uninote.fragments.ProfileFragment;
 import com.example.uninote.fragments.ProjectFragment;
 import com.example.uninote.fragments.ReminderFragment;
@@ -53,9 +54,11 @@ public class ProjectActivity extends AppCompatActivity {
                         break;
                     case R.id.action_directory:
                         fragment = new ShareFragment();
+                        fragment.setArguments(args);
                         break;
                     case R.id.action_message:
-                        fragment = new ProjectFragment();
+                        fragment = new MessageFragment();
+                        fragment.setArguments(args);
                         break;
                     case R.id.action_profile:
                         fragment = new ProfileFragment();

@@ -19,10 +19,13 @@ import com.example.uninote.R;
 import com.example.uninote.ShareAdapter;
 import com.example.uninote.ShareContent;
 import com.example.uninote.ToDoAdapter;
+import com.example.uninote.models.Project;
+import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -73,16 +76,23 @@ public class ShareFragment extends Fragment {
     }
 
     private void queryProfiles() {
-        final ParseQuery<ParseUser> query = ParseQuery.getQuery("_User");
-        query.whereNotEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        query.findInBackground(new FindCallback<ParseUser>() {
+        final Project project = getArguments().getParcelable("code");
+        final ParseQuery<Project> innerQuery = ParseQuery.getQuery("Project");
+        innerQuery.whereEqualTo("objectId", project.getObjectId());
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Project");
+        query.whereMatchesQuery("project", innerQuery);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseUser> objects, ParseException e) {
-                for (ParseUser parseUser : objects) {
-                    Log.i(TAG, "User: " + parseUser.getUsername());
+            public void done(List<ParseObject> users, ParseException e) {
+                for (ParseObject user : users) {
+                    try {
+                        allUsers.add(user.getParseUser("username").fetchIfNeeded());
+                    } catch (ParseException parseException) {
+                        parseException.printStackTrace();
+                    }
+                    adapter.notifyDataSetChanged();
                 }
-                allUsers.addAll(objects);
-                adapter.notifyDataSetChanged();
             }
         });
     }

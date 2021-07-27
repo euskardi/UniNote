@@ -52,7 +52,7 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView tvName;
         private final ImageView ivImage;
@@ -61,7 +61,6 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
             super(itemView);
             tvName = itemView.findViewById(R.id.tvName);
             ivImage = itemView.findViewById(R.id.ivProfileFriend);
-            itemView.setOnClickListener(this);
         }
 
         public void bind(ParseUser parseUser) {
@@ -70,18 +69,6 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
             if (image != null) {
                 Glide.with(context).load(parseUser.getParseFile("picture").getUrl()).into(ivImage);
             }
-        }
-
-        @Override
-        public void onClick(View v) {
-            final int position = getAdapterPosition();
-            if (position == RecyclerView.NO_POSITION) {
-                return;
-            }
-            final ParseUser parseUser = users.get(position);
-            final Intent intent = new Intent(context, ChatActivity.class);
-            intent.putExtra(ParseUser.class.getSimpleName(), Parcels.wrap(parseUser));
-            context.startActivity(intent);
         }
     }
 }
