@@ -18,6 +18,7 @@ import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
+import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
@@ -31,15 +32,17 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
 
     private final Context context;
     private final List<Reminder> Reminders;
+    private final boolean click;
 
-    public ReminderAdapter(Context context, List<Reminder> reminders) {
+    public ReminderAdapter(Context context, List<Reminder> Reminders, boolean click) {
         this.context = context;
-        this.Reminders = reminders;
+        this.Reminders = Reminders;
+        this.click = click;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public ReminderAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_reminder, parent, false));
     }
 
@@ -94,7 +97,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
         @Override
         public void onClick(View v) {
             final int position = getAdapterPosition();
-            if (position == RecyclerView.NO_POSITION) {
+            if (position == RecyclerView.NO_POSITION || !click) {
                 return;
             }
             final Reminder reminder = Reminders.get(position);

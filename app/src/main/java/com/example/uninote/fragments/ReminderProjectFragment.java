@@ -21,6 +21,7 @@ import com.example.uninote.R;
 import com.example.uninote.ReminderAdapter;
 import com.example.uninote.ReminderDetailActivity;
 import com.example.uninote.ToDoAdapter;
+import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ReminderFragment extends Fragment {
+public class ReminderProjectFragment extends ReminderFragment {
 
     public static final String TAG = "RemindersFragment";
     private SwipeRefreshLayout swipeContainer;
@@ -44,7 +45,7 @@ public class ReminderFragment extends Fragment {
     private ReminderAdapter adapter;
     private List<Reminder> allReminders;
 
-    public ReminderFragment() {
+    public ReminderProjectFragment() {
     }
 
     @Override
@@ -56,20 +57,18 @@ public class ReminderFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        final boolean typeOfLecture = viewType();
         btnAdd = view.findViewById(R.id.btnAdd);
         rvReminders = view.findViewById(R.id.rvReminders);
         allReminders = new ArrayList<>();
-        adapter = new ReminderAdapter(getContext(), allReminders, true);
+        adapter = new ReminderAdapter(getContext(), allReminders, typeOfLecture);
         rvReminders.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvReminders.setLayoutManager(mLayoutManager);
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getContext(), ReminderDetailActivity.class));
-            }
-        });
+        if (!typeOfLecture) {
+            btnAdd.setVisibility(View.GONE);
+        }
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContent);
 
@@ -84,29 +83,40 @@ public class ReminderFragment extends Fragment {
         queryReminders();
     }
 
-    //COMMENT FOR ME: Needs to search a better form to get the data
-    private void queryReminders() {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
-        innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Reminder");
-        query.whereMatchesQuery("username", innerQuery);
+    private boolean viewType() {
+        final Project project = getArguments().getParcelable("code");
+        final boolean[] type = new boolean[1];
+
+        final ParseQuery<ParseUser> innerQueryOne = ParseQuery.getQuery("_User");
+        innerQueryOne.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
+        final ParseQuery<ParseUser> innerQueryTwo = ParseQuery.getQuery("Project");
+        innerQueryTwo.whereEqualTo("objectId", project.getObjectId());
+
+        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Project");
+        query.whereMatchesQuery("username", innerQueryOne);
+        query.whereMatchesQuery("project", innerQueryTwo);
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> reminders, ParseException e) {
-                for (ParseObject reminder : reminders) {
-                    Log.i(TAG, "Reminder is good " + reminder.getParseObject("reminder").getObjectId());
-                    final ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
-                    query.whereEqualTo("objectId", reminder.getParseObject("reminder").getObjectId());
+                type[0] = reminders.get(0).getBoolean("type");
+            }
+        });
+        return type[0];
+    }
 
-                    query.findInBackground(new FindCallback<Reminder>() {
-                        @Override
-                        public void done(List<Reminder> objects, ParseException e) {
-                            allReminders.addAll(objects);
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
-                }
+    private void queryReminders() {
+        final Project project = getArguments().getParcelable("code");
+        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("Project");
+        innerQuery.whereEqualTo("objectId", project.getObjectId());
+        final ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
+        query.whereMatchesQuery("Project", innerQuery);
+
+        query.findInBackground(new FindCallback<Reminder>() {
+            @Override
+            public void done(List<Reminder> reminders, ParseException e) {
+                allReminders.addAll(reminders);
+                adapter.notifyDataSetChanged();
             }
         });
     }

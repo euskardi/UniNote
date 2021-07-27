@@ -10,12 +10,17 @@
     <item
         android:id="@+id/action_todo"
         android:icon="@drawable/ic_baseline_create_24"
-        android:title="ToDos"
+        android:title="ToDo"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_project"
-        android:icon="@drawable/ic_baseline_book_24"
-        android:title="Projects"
+        android:id="@+id/action_directory"
+        android:icon="@drawable/ic_baseline_contacts_24"
+        android:title="Directory"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_message"
+        android:icon="@drawable/ic_baseline_chat_24"
+        android:title="Talk"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_profile"
