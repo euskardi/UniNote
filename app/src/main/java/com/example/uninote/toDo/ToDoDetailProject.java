@@ -96,7 +96,9 @@ public class ToDoDetailProject extends PhotoTaken {
             }
         });
 
-        startActivity(new Intent(this, ProjectActivity.class));
+        final Intent intentProject = new Intent(this, ProjectActivity.class);
+        intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+        this.startActivity(intentProject);
         finish();
     }
 }

@@ -93,15 +93,16 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
                 return;
             }
             final ToDo toDo = toDos.get(position);
-            if (project != null) {
-                final Intent intentProject = new Intent(context, EditToDoProject.class);
-                intentProject.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
-                context.startActivity(intentProject);
+            if (project == null) {
+                final Intent intent = new Intent(context, EditToDo.class);
+                intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
+                context.startActivity(intent);
                 return;
             }
-            final Intent intent = new Intent(context, EditToDo.class);
-            intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
-            context.startActivity(intent);
+            final Intent intentProject = new Intent(context, EditToDoProject.class);
+            intentProject.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
+            intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+            context.startActivity(intentProject);
         }
     }
 }
