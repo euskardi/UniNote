@@ -15,6 +15,8 @@ public class Reminder extends ParseObject {
     public static final String KEY_DATE = "Day";
     public static final String KEY_USER = "Username";
     public static final String KEY_LOCATION = "Location";
+    public static final String KEY_PROJECT = "Project";
+
 
     public String getTitle() {
         return getString(KEY_TITLE);
@@ -46,5 +48,13 @@ public class Reminder extends ParseObject {
 
     public void setLocation(ParseGeoPoint location) {
         put(KEY_LOCATION, location);
+    }
+
+    public ParseObject getProject() {
+        return getParseObject(KEY_PROJECT);
+    }
+
+    public void setProject(Project project) {
+        put(KEY_PROJECT, project);
     }
 }

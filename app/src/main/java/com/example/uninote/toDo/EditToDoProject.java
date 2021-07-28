@@ -128,9 +128,9 @@ public class EditToDoProject extends PhotoTaken {
             object.deleteInBackground(e2 -> {
                 if (e2 == null) {
                     Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
             });
         });
     }

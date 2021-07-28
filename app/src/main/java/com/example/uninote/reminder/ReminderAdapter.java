@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.uninote.R;
+import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
 import com.parse.ParseGeoPoint;
 
@@ -28,11 +29,19 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     private final Context context;
     private final List<Reminder> Reminders;
     private final boolean click;
+    private Project project;
 
     public ReminderAdapter(Context context, List<Reminder> Reminders, boolean click) {
         this.context = context;
         this.Reminders = Reminders;
         this.click = click;
+    }
+
+    public ReminderAdapter(Context context, List<Reminder> Reminders, boolean click, Project project) {
+        this.context = context;
+        this.Reminders = Reminders;
+        this.click = click;
+        this.project = project;
     }
 
     @NonNull
@@ -96,6 +105,12 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
                 return;
             }
             final Reminder reminder = Reminders.get(position);
+            if (project != null) {
+                final Intent intentProject = new Intent(context, EditReminderProject.class);
+                intentProject.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
+                context.startActivity(intentProject);
+                return;
+            }
             final Intent intent = new Intent(context, EditReminder.class);
             intent.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
             context.startActivity(intent);
