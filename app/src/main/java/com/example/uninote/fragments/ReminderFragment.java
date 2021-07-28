@@ -15,12 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.example.uninote.R;
-import com.example.uninote.ReminderAdapter;
-import com.example.uninote.ReminderDetailActivity;
-import com.example.uninote.ToDoAdapter;
+import com.example.uninote.reminder.ReminderAdapter;
+import com.example.uninote.reminder.ReminderDetailActivity;
 import com.example.uninote.models.Reminder;
 import com.parse.FindCallback;
 import com.parse.ParseException;

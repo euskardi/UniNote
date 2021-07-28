@@ -19,11 +19,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UniNote">
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".toDo.EditToDoProject"/>
+        <activity android:name=".ChatActivity" />
         <activity android:name=".ShareContent" />
-        <activity android:name=".EditReminder" />
-        <activity android:name=".EditToDo" />
-        <activity android:name=".ToDoDetailActivity" />
+        <activity android:name=".reminder.EditReminder" />
+        <activity android:name=".toDo.EditToDo" />
+        <activity android:name=".toDo.ToDoDetailActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -35,7 +36,7 @@
                 android:resource="@xml/file_provider" />
         </provider>
 
-        <activity android:name=".ReminderDetailActivity" />
+        <activity android:name=".reminder.ReminderDetailActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,6 +54,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ProjectActivity" />
+        <activity android:name=".toDo.ToDoDetailProject" />
+
     </application>
 
 </manifest>

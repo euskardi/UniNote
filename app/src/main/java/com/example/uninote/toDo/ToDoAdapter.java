@@ -1,4 +1,4 @@
-package com.example.uninote;
+package com.example.uninote.toDo;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.uninote.R;
+import com.example.uninote.models.Project;
 import com.example.uninote.models.ToDo;
 import com.parse.ParseFile;
 
@@ -25,11 +27,19 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     private final Context context;
     private final List<ToDo> toDos;
     private final boolean click;
+    private Project project;
 
     public ToDoAdapter(Context context, List<ToDo> toDos, boolean click) {
         this.context = context;
         this.toDos = toDos;
         this.click = click;
+    }
+
+    public ToDoAdapter(Context context, List<ToDo> toDos, boolean click, Project project) {
+        this.context = context;
+        this.toDos = toDos;
+        this.click = click;
+        this.project = project;
     }
 
     @NonNull
@@ -83,6 +93,12 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
                 return;
             }
             final ToDo toDo = toDos.get(position);
+            if (project != null) {
+                final Intent intentProject = new Intent(context, EditToDoProject.class);
+                intentProject.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
+                context.startActivity(intentProject);
+                return;
+            }
             final Intent intent = new Intent(context, EditToDo.class);
             intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
             context.startActivity(intent);

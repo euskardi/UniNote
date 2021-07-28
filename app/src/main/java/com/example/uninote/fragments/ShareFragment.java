@@ -9,21 +9,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 
 import com.example.uninote.R;
 import com.example.uninote.ShareAdapter;
-import com.example.uninote.ShareContent;
-import com.example.uninote.ToDoAdapter;
 import com.example.uninote.models.Project;
-import com.example.uninote.models.Reminder;
-import com.example.uninote.models.ToDo;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;

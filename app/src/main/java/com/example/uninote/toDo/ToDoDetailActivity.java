@@ -1,4 +1,4 @@
-package com.example.uninote;
+package com.example.uninote.toDo;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.uninote.MainActivity;
+import com.example.uninote.R;
 import com.example.uninote.models.PhotoTaken;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
 import com.parse.ParseACL;
 import com.parse.ParseException;

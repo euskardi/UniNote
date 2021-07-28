@@ -1,4 +1,4 @@
-package com.example.uninote;
+package com.example.uninote.reminder;
 
 import androidx.annotation.NonNull;
 
@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +15,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.uninote.MainActivity;
+import com.example.uninote.R;
+import com.example.uninote.ShareContent;
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Reminder;
 import com.parse.DeleteCallback;

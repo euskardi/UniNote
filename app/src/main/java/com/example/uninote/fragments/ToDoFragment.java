@@ -17,10 +17,9 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.example.uninote.R;
-import com.example.uninote.ToDoDetailActivity;
-import com.example.uninote.models.Reminder;
+import com.example.uninote.toDo.ToDoDetailActivity;
 import com.example.uninote.models.ToDo;
-import com.example.uninote.ToDoAdapter;
+import com.example.uninote.toDo.ToDoAdapter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;

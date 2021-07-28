@@ -12,6 +12,7 @@ public class ToDo extends ParseObject {
     public static final String KEY_CONTENT = "Content";
     public static final String KEY_USER = "Username";
     public static final String KEY_IMAGE = "Photo";
+    public static final String KEY_PROJECT = "Project";
 
     public String getTitle() {
         return getString(KEY_TITLE);
@@ -43,6 +44,14 @@ public class ToDo extends ParseObject {
 
     public void setImage(ParseFile parseFile) {
         put(KEY_IMAGE, parseFile);
+    }
+
+    public ParseObject getProject() {
+        return getParseObject(KEY_PROJECT);
+    }
+
+    public void setProject(Project project) {
+        put(KEY_PROJECT, project);
     }
 }
 

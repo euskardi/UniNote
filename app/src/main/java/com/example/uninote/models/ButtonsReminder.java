@@ -11,24 +11,14 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.uninote.EditReminder;
 import com.example.uninote.R;
-import com.example.uninote.ReminderDetailActivity;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseUser;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ButtonsReminder extends AppCompatActivity {
     public static final String TAG = "ReminderActivity";

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="true"
     android:orientation="vertical"
-    tools:context=".ToDoDetailActivity">
+    tools:context=".toDo.ToDoDetailActivity">
 
 <ScrollView
     android:layout_width="match_parent"

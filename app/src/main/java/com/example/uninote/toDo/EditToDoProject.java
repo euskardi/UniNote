@@ -1,4 +1,4 @@
-package com.example.uninote;
+package com.example.uninote.toDo;
 
 import androidx.annotation.NonNull;
 
@@ -15,8 +15,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.uninote.MainActivity;
+import com.example.uninote.ProjectActivity;
+import com.example.uninote.R;
+import com.example.uninote.ShareContent;
 import com.example.uninote.models.PhotoTaken;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -31,7 +34,7 @@ import org.parceler.Parcels;
 import java.io.File;
 import java.util.List;
 
-public class EditToDo extends PhotoTaken {
+public class EditToDoProject extends PhotoTaken {
 
     private TextView tvName;
     private EditText etTitle;
@@ -71,7 +74,7 @@ public class EditToDo extends PhotoTaken {
                 final String title = etTitle.getText().toString();
                 final String description = etDescription.getText().toString();
                 if (description.isEmpty() || title.isEmpty()) {
-                    Toast.makeText(EditToDo.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditToDoProject.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 final ParseUser currentUser = ParseUser.getCurrentUser();
@@ -91,28 +94,22 @@ public class EditToDo extends PhotoTaken {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_detail, menu);
+        getMenuInflater().inflate(R.menu.menu_detail_project, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.share:
-                final Intent intent = new Intent(this, ShareContent.class);
-                intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
-                startActivity(intent);
-                finish();
-                return true;
 
             case R.id.delete:
                 deleteToDo(toDo);
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this, ProjectActivity.class));
                 finish();
                 return true;
 
             case R.id.cancel:
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this, ProjectActivity.class));
                 finish();
                 return true;
 
@@ -122,26 +119,6 @@ public class EditToDo extends PhotoTaken {
     }
 
     private void deleteToDo(ToDo toDo) {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("ToDo");
-        innerQuery.whereEqualTo("objectId", toDo.getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_ToDo");
-        query.whereMatchesQuery("toDo", innerQuery);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                for (ParseObject object : objects) {
-                    object.deleteInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(com.parse.ParseException e) {
-                            if (e != null) {
-                                Toast.makeText(EditToDo.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
         final ParseQuery<ParseObject> queryToDo = ParseQuery.getQuery("ToDo");
         queryToDo.getInBackground(toDo.getObjectId(), (object, e) -> {
             if (e != null) {
@@ -175,7 +152,6 @@ public class EditToDo extends PhotoTaken {
             object.put("Username", currentUser);
             object.saveInBackground();
         });
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
     }
 }

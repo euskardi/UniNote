@@ -1,5 +1,6 @@
 package com.example.uninote.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,11 +15,12 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.example.uninote.R;
-import com.example.uninote.ReminderAdapter;
-import com.example.uninote.ToDoAdapter;
+import com.example.uninote.toDo.EditToDo;
+import com.example.uninote.toDo.ToDoAdapter;
 import com.example.uninote.models.Project;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.toDo.ToDoDetailActivity;
+import com.example.uninote.toDo.ToDoDetailProject;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -26,6 +28,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,18 +56,19 @@ public class ToDoProjectFragment extends ToDoFragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final boolean typeOfLecture = viewType();
+        final boolean userType = viewType();
+
         btnAdd = view.findViewById(R.id.btnAdd);
+        if (!userType) {
+            btnAdd.setVisibility(View.GONE);
+        }
+
         rvToDos = view.findViewById(R.id.rvToDos);
         allToDos = new ArrayList<>();
-        adapter = new ToDoAdapter(getContext(), allToDos, viewType());
+        adapter = new ToDoAdapter(getContext(), allToDos, userType, getArguments().getParcelable("code"));
         rvToDos.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvToDos.setLayoutManager(mLayoutManager);
-
-        if (!typeOfLecture) {
-            btnAdd.setVisibility(View.GONE);
-        }
 
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContent);
 
@@ -76,12 +80,22 @@ public class ToDoProjectFragment extends ToDoFragment {
                 swipeContainer.setRefreshing(false);
             }
         });
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Project project = getArguments().getParcelable("code");
+                final Intent intent = new Intent(getContext(), ToDoDetailProject.class);
+                intent.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                getContext().startActivity(intent);
+            }
+        });
+
         queryToDos();
     }
 
     private boolean viewType() {
         final Project project = getArguments().getParcelable("code");
-        final boolean[] type = new boolean[1];
 
         final ParseQuery<ParseUser> innerQueryOne = ParseQuery.getQuery("_User");
         innerQueryOne.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
@@ -92,13 +106,13 @@ public class ToDoProjectFragment extends ToDoFragment {
         query.whereMatchesQuery("username", innerQueryOne);
         query.whereMatchesQuery("project", innerQueryTwo);
 
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> reminders, ParseException e) {
-                type[0] = reminders.get(0).getBoolean("type");
-            }
-        });
-        return type[0];
+        try {
+            ParseObject object = query.getFirst();
+            return object.getBoolean("type");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void queryToDos() {
