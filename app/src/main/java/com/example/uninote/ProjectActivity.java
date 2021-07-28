@@ -48,16 +48,16 @@ public class ProjectActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment;
                 switch (item.getItemId()) {
+                    case R.id.action_directory:
+                        fragment = new ShareFragment();
+                        fragment.setArguments(args);
+                        break;
                     case R.id.action_reminder:
                         fragment = new ReminderProjectFragment();
                         fragment.setArguments(args);
                         break;
                     case R.id.action_todo:
                         fragment = new ToDoProjectFragment();
-                        fragment.setArguments(args);
-                        break;
-                    case R.id.action_directory:
-                        fragment = new ShareFragment();
                         fragment.setArguments(args);
                         break;
                     case R.id.action_message:

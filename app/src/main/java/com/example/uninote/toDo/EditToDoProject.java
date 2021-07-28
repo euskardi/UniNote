@@ -20,6 +20,7 @@ import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
 import com.example.uninote.ShareContent;
 import com.example.uninote.models.PhotoTaken;
+import com.example.uninote.models.Project;
 import com.example.uninote.models.ToDo;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -43,6 +44,7 @@ public class EditToDoProject extends PhotoTaken {
     private ImageView ivPostImage;
     private Button btnSubmit;
     private ToDo toDo;
+    private Project project;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class EditToDoProject extends PhotoTaken {
         btnSubmit = findViewById(R.id.btnCreateToDo);
 
         toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
+        project = Parcels.unwrap(getIntent().getParcelableExtra(Project.class.getSimpleName()));
 
         tvName.setText("Edit ToDo");
         etTitle.setText(toDo.getTitle());
@@ -100,16 +103,18 @@ public class EditToDoProject extends PhotoTaken {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+        final Intent intentProject = new Intent(this, ProjectActivity.class);
         switch (item.getItemId()) {
-
             case R.id.delete:
                 deleteToDo(toDo);
-                startActivity(new Intent(this, ProjectActivity.class));
+                intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                this.startActivity(intentProject);
                 finish();
                 return true;
 
             case R.id.cancel:
-                startActivity(new Intent(this, ProjectActivity.class));
+                intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                this.startActivity(intentProject);
                 finish();
                 return true;
 
@@ -119,7 +124,7 @@ public class EditToDoProject extends PhotoTaken {
     }
 
     private void deleteToDo(ToDo toDo) {
-        final ParseQuery<ParseObject> queryToDo = ParseQuery.getQuery("ToDo");
+        final ParseQuery<ToDo> queryToDo = ParseQuery.getQuery("ToDo");
         queryToDo.getInBackground(toDo.getObjectId(), (object, e) -> {
             if (e != null) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();

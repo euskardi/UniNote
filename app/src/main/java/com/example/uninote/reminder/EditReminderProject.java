@@ -16,9 +16,11 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.uninote.MainActivity;
+import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
 import com.example.uninote.ShareContent;
 import com.example.uninote.models.ButtonsReminder;
+import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -56,6 +58,7 @@ public class EditReminderProject extends ButtonsReminder {
     private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private int hour, minutes;
     private Reminder reminder;
+    private Project project;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,7 @@ public class EditReminderProject extends ButtonsReminder {
         btnCreateReminder = findViewById(R.id.btnCreateReminder);
 
         reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
+        project = Parcels.unwrap(getIntent().getParcelableExtra(Project.class.getSimpleName()));
 
         btnCreateReminder.setText("EDIT");
         etTitle.setText(reminder.getTitle());
@@ -141,15 +145,18 @@ public class EditReminderProject extends ButtonsReminder {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull @NotNull MenuItem item) {
+        final Intent intentProject = new Intent(this, ProjectActivity.class);
         switch (item.getItemId()) {
             case R.id.delete:
                 deleteReminder(reminder);
-                startActivity(new Intent(this, MainActivity.class));
+                intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                this.startActivity(intentProject);
                 finish();
                 return true;
 
             case R.id.cancel:
-                startActivity(new Intent(this, MainActivity.class));
+                intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                this.startActivity(intentProject);
                 finish();
                 return true;
 
@@ -159,7 +166,7 @@ public class EditReminderProject extends ButtonsReminder {
     }
 
     private void deleteReminder(Reminder reminder) {
-        final ParseQuery<ParseObject> queryReminder = ParseQuery.getQuery("Reminder");
+        final ParseQuery<Reminder> queryReminder = ParseQuery.getQuery("Reminder");
         queryReminder.getInBackground(reminder.getObjectId(), (object, e) -> {
             if (e != null) {
                 Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();

@@ -105,14 +105,15 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
                 return;
             }
             final Reminder reminder = Reminders.get(position);
-            if (project != null) {
-                final Intent intentProject = new Intent(context, EditReminderProject.class);
+            if (project == null) {
+                final Intent intentProject = new Intent(context, EditReminder.class);
                 intentProject.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
                 context.startActivity(intentProject);
                 return;
             }
-            final Intent intent = new Intent(context, EditReminder.class);
+            final Intent intent = new Intent(context, EditReminderProject.class);
             intent.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
+            intent.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
             context.startActivity(intent);
         }
     }
