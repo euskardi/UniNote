@@ -19,7 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UniNote">
-        <activity android:name=".reminder.EditReminderProject"></activity>
+        <activity android:name=".ProjectDetailActivity"></activity>
+        <activity android:name=".reminder.EditReminderProject" />
         <activity android:name=".reminder.ReminderDetailProject" />
         <activity android:name=".toDo.EditToDoProject" />
         <activity android:name=".ChatActivity" />

@@ -1,5 +1,6 @@
 package com.example.uninote.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,9 +18,12 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.uninote.ProjectAdapter;
+import com.example.uninote.ProjectDetailActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.reminder.ReminderDetailActivity;
+import com.example.uninote.reminder.ReminderDetailProject;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -27,6 +31,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +79,14 @@ public class ProjectFragment extends Fragment {
                 swipeContainer.setRefreshing(false);
             }
         });
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ProjectDetailActivity.class));
+            }
+        });
+
         queryProjects();
     }
 
