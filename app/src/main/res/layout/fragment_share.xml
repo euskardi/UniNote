@@ -22,6 +22,41 @@
             android:clipToPadding="false"
             android:padding="15dp" />
 
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    <TextView
+        android:id="@+id/tvWrite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvLecture"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="70dp"
+        android:layout_marginTop="-50dp"
+        android:layout_marginEnd="70dp"
+        android:layout_marginBottom="69dp"
+        android:foregroundGravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:text="Edit Code: sfjhbsfddhsbf" />
+
+    <TextView
+        android:id="@+id/tvLecture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/swipeContentShare"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="69dp"
+        android:layout_marginBottom="69dp"
+        android:foregroundGravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:text="Lecture Code: sfjhbsfddhsbf" />
 
 </RelativeLayout>

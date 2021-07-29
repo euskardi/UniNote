@@ -12,6 +12,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.uninote.R;
 import com.example.uninote.ShareAdapter;
@@ -32,6 +34,8 @@ public class ShareFragment extends Fragment {
     public static final String TAG = "ShareFragment";
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView rvProfiles;
+    private TextView tvLecture;
+    private TextView tvWrite;
     private LinearLayoutManager mLayoutManager;
     private ShareAdapter adapter;
     private List<ParseUser> allUsers;
@@ -49,6 +53,8 @@ public class ShareFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         rvProfiles = view.findViewById(R.id.rvShare);
+        tvLecture = view.findViewById(R.id.tvLecture);
+        tvWrite = view.findViewById(R.id.tvWrite);
         allUsers = new ArrayList<>();
         adapter = new ShareAdapter(getContext(), allUsers);
         rvProfiles.setAdapter(adapter);
@@ -65,6 +71,11 @@ public class ShareFragment extends Fragment {
                 swipeContainer.setRefreshing(false);
             }
         });
+
+        final Project project = getArguments().getParcelable("code");
+        tvLecture.setText("Lecture Code: " + project.getObjectId() + "-0");
+        tvWrite.setText("Write Code: " + project.getObjectId() + "-1");
+
         queryProfiles();
     }
 
