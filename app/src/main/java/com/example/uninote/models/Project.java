@@ -10,6 +10,8 @@ public class Project extends ParseObject {
     public static final String KEY_TITLE = "Title";
     public static final String KEY_DESCRIPTION = "Description";
     public static final String KEY_EDITOR = "Editor";
+    public int countReminders;
+    public int countTodos;
 
     public String getTitle() {
         return getString(KEY_TITLE);
@@ -33,6 +35,22 @@ public class Project extends ParseObject {
 
     public void setEditor(ParseUser parseUser) {
         put(KEY_EDITOR, parseUser);
+    }
+
+    public int getCountReminders() {
+        return countReminders;
+    }
+
+    public void setCountReminders(int countReminders) {
+        this.countReminders = countReminders;
+    }
+
+    public int getCountTodos() {
+        return countTodos;
+    }
+
+    public void setCountTodos(int countTodos) {
+        this.countTodos = countTodos;
     }
 
 }

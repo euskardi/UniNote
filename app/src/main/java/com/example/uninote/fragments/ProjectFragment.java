@@ -14,10 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.uninote.ProjectAdapter;
 import com.example.uninote.R;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.Reminder;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -39,6 +41,8 @@ public class ProjectFragment extends Fragment {
     private ImageButton btnAdd;
     private ProjectAdapter adapter;
     private List<Project> allProjects;
+    private int countReminders;
+    private int countToDos;
 
     public ProjectFragment() {
     }
@@ -55,7 +59,7 @@ public class ProjectFragment extends Fragment {
         btnAdd = view.findViewById(R.id.btnAdd);
         rvProjects = view.findViewById(R.id.rvProjects);
         allProjects = new ArrayList<>();
-        adapter = new ProjectAdapter(getContext(), allProjects);
+        adapter = new ProjectAdapter(getContext(), allProjects); //dddddd
         rvProjects.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvProjects.setLayoutManager(mLayoutManager);
@@ -90,6 +94,9 @@ public class ProjectFragment extends Fragment {
                     query.findInBackground(new FindCallback<Project>() {
                         @Override
                         public void done(List<Project> objects, ParseException e) {
+                            for (Project object : objects) {
+                                queryCount(object);
+                            }
                             allProjects.addAll(objects);
                             adapter.notifyDataSetChanged();
                         }
@@ -97,5 +104,26 @@ public class ProjectFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void queryCount(Project project) {
+        final ParseQuery<Project> innerQuery = ParseQuery.getQuery("Project");
+        innerQuery.whereEqualTo("objectId", project.getObjectId());
+
+        final ParseQuery<ParseObject> queryReminder = ParseQuery.getQuery("Reminder");
+        queryReminder.whereMatchesQuery("Project", innerQuery);
+        try {
+            project.setCountReminders(queryReminder.count());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        final ParseQuery<ParseObject> queryToDo = ParseQuery.getQuery("ToDo");
+        queryToDo.whereMatchesQuery("Project", innerQuery);
+        try {
+            project.setCountTodos(queryToDo.count());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 }
