@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.uninote.ChatActivity;
 import com.example.uninote.MessageAdapter;
 import com.example.uninote.R;
 import com.example.uninote.models.Message;
@@ -29,7 +28,6 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +43,7 @@ public class MessageFragment extends Fragment {
     private ParseUser message;
     private EditText etMessage;
     private Button btnSend;
+
 
     public MessageFragment() {
     }
@@ -66,9 +65,6 @@ public class MessageFragment extends Fragment {
         rvMessages.setAdapter(adapter);
         rvMessages.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        final Project project = getArguments().getParcelable("code");
-        message = project.getEditor();
-
         queryMessages();
 
         btnSend.setOnClickListener(new View.OnClickListener() {
@@ -80,10 +76,11 @@ public class MessageFragment extends Fragment {
     }
 
     private void sendMessage() {
+        final Project project = getArguments().getParcelable("code");
         final Message newMessage = new Message();
         newMessage.setContent(etMessage.getText().toString());
         newMessage.setSender(ParseUser.getCurrentUser());
-        newMessage.setRecipient(message);
+        newMessage.setProject(project);
 
         allMessages.add(newMessage);
         adapter.notifyItemChanged(allMessages.size() - 1);
@@ -103,22 +100,11 @@ public class MessageFragment extends Fragment {
     }
 
     private void queryMessages() {
-
+        final Project project = getArguments().getParcelable("code");
         final ParseQuery<Message> conditionOne = ParseQuery.getQuery("Message");
-        conditionOne.whereEqualTo("sender", ParseUser.getCurrentUser());
-        conditionOne.whereEqualTo("recipient", message);
+        conditionOne.whereEqualTo("project", project);
 
-        final ParseQuery<Message> conditionTwo = ParseQuery.getQuery("Message");
-        conditionTwo.whereEqualTo("sender", message);
-        conditionTwo.whereEqualTo("recipient", ParseUser.getCurrentUser());
-
-        final List<ParseQuery<Message>> queries = new ArrayList<ParseQuery<Message>>();
-        queries.add(conditionOne);
-        queries.add(conditionTwo);
-
-        final ParseQuery<Message> mainQuery = ParseQuery.or(queries);
-
-        mainQuery.findInBackground(new FindCallback<Message>() {
+        conditionOne.findInBackground(new FindCallback<Message>() {
             @Override
             public void done(List<Message> objects, ParseException e) {
                 for (Message message : objects) {

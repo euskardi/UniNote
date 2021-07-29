@@ -23,7 +23,6 @@
         <activity android:name=".reminder.EditReminderProject" />
         <activity android:name=".reminder.ReminderDetailProject" />
         <activity android:name=".toDo.EditToDoProject" />
-        <activity android:name=".ChatActivity" />
         <activity android:name=".ShareContent" />
         <activity android:name=".reminder.EditReminder" />
         <activity android:name=".toDo.EditToDo" />

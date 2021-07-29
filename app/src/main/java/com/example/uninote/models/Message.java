@@ -9,7 +9,7 @@ public class Message extends ParseObject {
 
     public static final String KEY_CONTENT = "content";
     public static final String KEY_SENDER = "sender";
-    public static final String KEY_RECIPIENT = "recipient";
+    public static final String KEY_PROJECT = "project";
 
     public String getContent() {
         return getString(KEY_CONTENT);
@@ -27,11 +27,11 @@ public class Message extends ParseObject {
         put(KEY_SENDER, parseUser);
     }
 
-    public ParseUser getRecipient() {
-        return getParseUser(KEY_RECIPIENT);
+    public ParseObject getProject() {
+        return getParseObject(KEY_PROJECT);
     }
 
-    public void setRecipient(ParseUser parseUser) {
-        put(KEY_RECIPIENT, parseUser);
+    public void setProject(Project project) {
+        put(KEY_PROJECT, project);
     }
 }

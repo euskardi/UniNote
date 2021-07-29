@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -14,8 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.uninote.models.Message;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,10 +36,26 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         this.messages = messages;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        try {
+            final String messageUsername = messages.get(position).getSender().fetchIfNeeded().getUsername();
+            if (messageUsername.equals(ParseUser.getCurrentUser().getUsername())) {
+                return 1;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     @NonNull
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        if (viewType == 0) {
+            return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_message_me, parent, false));
+        }
         return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_message, parent, false));
     }
 
@@ -58,24 +77,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView tvMessage;
-        private final CardView cdMessage;
+        private final TextView tvName;
+        private final ImageView ivImage;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvMessageInput);
-            cdMessage = itemView.findViewById(R.id.cvMessage);
+            tvName = itemView.findViewById(R.id.tvMessageName);
+            ivImage = itemView.findViewById(R.id.ivImageMessage);
         }
 
         public void bind(Message message) {
             tvMessage.setText(message.getContent());
             try {
                 final String messageUsername = message.getSender().fetchIfNeeded().getUsername();
-                if (!messageUsername.equals(ParseUser.getCurrentUser().getUsername())) {
-                    Log.i(TAG, "My: ");
-                    cdMessage.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
-                }
+                tvName.setText(messageUsername);
             } catch (ParseException e) {
                 e.printStackTrace();
+            }
+            final ParseFile image = message.getSender().getParseFile("picture");
+            if (image != null) {
+                Glide.with(context).load(image.getUrl()).into(ivImage);
             }
         }
     }
