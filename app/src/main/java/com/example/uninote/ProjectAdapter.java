@@ -23,9 +23,11 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
     private final Context context;
     private final List<Project> projects;
 
+
     public ProjectAdapter(Context context, List<Project> projects) {
         this.context = context;
         this.projects = projects;
+
     }
 
 
@@ -54,17 +56,23 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
 
         private final TextView tvTitle;
         private final TextView tvDescription;
+        private final TextView tvReminders;
+        private final TextView tvToDos;
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvProject);
             tvDescription = itemView.findViewById(R.id.tvDescriptionProject);
+            tvReminders = itemView.findViewById(R.id.tvCountReminders);
+            tvToDos = itemView.findViewById(R.id.tvCountToDos);
             itemView.setOnClickListener(this);
         }
 
         public void bind(Project project) {
             tvTitle.setText(project.getTitle());
             tvDescription.setText(project.getDescription());
+            tvReminders.setText("Reminders: " + project.getCountReminders());
+            tvToDos.setText("ToDos: " + project.getCountTodos());
         }
 
         @Override
