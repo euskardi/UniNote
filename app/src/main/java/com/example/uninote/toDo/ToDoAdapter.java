@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.uninote.R;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.models.ToDoFirebase;
 import com.parse.ParseFile;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,17 +27,17 @@ import java.util.List;
 public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<ToDo> toDos;
+    private final List<ToDoFirebase> toDos;
     private final boolean click;
     private Project project;
 
-    public ToDoAdapter(Context context, List<ToDo> toDos, boolean click) {
+    public ToDoAdapter(Context context, List<ToDoFirebase> toDos, boolean click) {
         this.context = context;
         this.toDos = toDos;
         this.click = click;
     }
 
-    public ToDoAdapter(Context context, List<ToDo> toDos, boolean click, Project project) {
+    public ToDoAdapter(Context context, List<ToDoFirebase> toDos, boolean click, Project project) {
         this.context = context;
         this.toDos = toDos;
         this.click = click;
@@ -77,12 +79,11 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             itemView.setOnClickListener(this);
         }
 
-        public void bind(ToDo toDo) {
+        public void bind(ToDoFirebase toDo) {
             tvTitle.setText(toDo.getTitle());
-            tvDescription.setText(toDo.getContent());
-            final ParseFile image = toDo.getImage();
-            if (image != null) {
-                Glide.with(context).load(toDo.getImage().getUrl()).into(ivImage);
+            tvDescription.setText(toDo.getDescription());
+            if (toDo.getUrl() != null) {
+                Glide.with(context).load(toDo.getUrl()).into(ivImage);
             } else ivImage.setVisibility(View.GONE);
         }
 
@@ -92,10 +93,10 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
             if (position == RecyclerView.NO_POSITION || !click) {
                 return;
             }
-            final ToDo toDo = toDos.get(position);
+            final ToDoFirebase toDo = toDos.get(position);
             if (project == null) {
                 final Intent intent = new Intent(context, EditToDo.class);
-                intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
+                intent.putExtra(ToDoFirebase.class.getSimpleName(), toDo);
                 context.startActivity(intent);
                 return;
             }

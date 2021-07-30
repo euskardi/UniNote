@@ -3,7 +3,10 @@ package com.example.uninote.toDo;
 import androidx.annotation.NonNull;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +22,22 @@ import com.example.uninote.MainActivity;
 import com.example.uninote.R;
 import com.example.uninote.ShareContent;
 import com.example.uninote.models.PhotoTaken;
+import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.models.ToDoFirebase;
+import com.example.uninote.reminder.EditReminder;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseFile;
@@ -31,7 +49,11 @@ import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class EditToDo extends PhotoTaken {
 
@@ -41,7 +63,14 @@ public class EditToDo extends PhotoTaken {
     private ImageButton btnCaptureImage;
     private ImageView ivPostImage;
     private Button btnSubmit;
-    private ToDo toDo;
+    private ToDoFirebase toDo;
+
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
+    private final ToDoFirebase toDoFirebase = new ToDoFirebase();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +84,16 @@ public class EditToDo extends PhotoTaken {
         ivPostImage = findViewById(R.id.ivImageToDo);
         btnSubmit = findViewById(R.id.btnCreateToDo);
 
-        toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
+        toDo = getIntent().getParcelableExtra(ToDoFirebase.class.getSimpleName());
+
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
         tvName.setText("Edit ToDo");
         etTitle.setText(toDo.getTitle());
-        etDescription.setText(toDo.getContent());
+        etDescription.setText(toDo.getDescription());
         try {
-            Glide.with(this).load(toDo.getImage().getUrl()).into(ivPostImage);
+            Glide.with(this).load(toDo.getUrl()).into(ivPostImage);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +110,7 @@ public class EditToDo extends PhotoTaken {
                 }
                 final ParseUser currentUser = ParseUser.getCurrentUser();
 
-                updateToDo(title, description, currentUser, photoFile, toDo);
+                updateToDo(title, description, currentUser, photoFile);
             }
         });
 
@@ -88,6 +120,31 @@ public class EditToDo extends PhotoTaken {
                 launchCamera();
             }
         });
+    }
+
+    private void uploadImage() {
+        final String randomKey = UUID.randomUUID().toString();
+        final StorageReference imageRef = storageReference.child("images/" + randomKey);
+
+        imageRef.putFile(fileProvider)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
+                        while (!urlTask.isSuccessful()) ;
+                        Log.i(TAG, String.valueOf(urlTask.getResult()));
+                        toDoFirebase.setUrl(String.valueOf(urlTask.getResult()));
+                        Toast.makeText(EditToDo.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(EditToDo.this, "No Uploaded", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
     }
 
 
@@ -123,61 +180,62 @@ public class EditToDo extends PhotoTaken {
         }
     }
 
-    private void deleteToDo(ToDo toDo) {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("ToDo");
-        innerQuery.whereEqualTo("objectId", toDo.getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_ToDo");
-        query.whereMatchesQuery("toDo", innerQuery);
-        query.findInBackground(new FindCallback<ParseObject>() {
+    private void deleteToDo(ToDoFirebase toDo) {
+        final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
+        rootDatabase.child("ToDos").child(toDo.getId()).removeValue();
+
+        final Query innerQuery = FirebaseDatabase.getInstance().getReference("UserHasToDo")
+                .orderByChild("toDo")
+                .equalTo(toDo.getId());
+
+        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                for (ParseObject object : objects) {
-                    object.deleteInBackground(new DeleteCallback() {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    final String key = dataSnapshot.getKey();
+                    rootDatabase.child("UserHasToDo").child(key).removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(EditToDo.this, "Error In Connection", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateToDo(String title, String description, ParseUser currentUser, File photoFile) {
+        uploadImage();
+        final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
+
+        final HashMap hashMap = new HashMap();
+        hashMap.put("title", title);
+        hashMap.put("description", description);
+        hashMap.put("url", toDoFirebase);
+
+        final Query innerQuery = FirebaseDatabase.getInstance().getReference("ToDos")
+                .orderByChild("title")
+                .equalTo(toDo.getTitle());
+
+        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    final String key = dataSnapshot.getKey();
+                    rootDatabase.child("ToDos").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
                         @Override
-                        public void done(com.parse.ParseException e) {
-                            if (e != null) {
-                                Toast.makeText(EditToDo.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                        public void onSuccess(Object o) {
+                            Toast.makeText(EditToDo.this, "Your data is Successfully Updated", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             }
-        });
 
-        final ParseQuery<ParseObject> queryToDo = ParseQuery.getQuery("ToDo");
-        queryToDo.getInBackground(toDo.getObjectId(), (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(EditToDo.this, "Error In Connection", Toast.LENGTH_SHORT).show();
             }
-            object.deleteInBackground(e2 -> {
-                if (e2 == null) {
-                    Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
         });
-    }
-
-    private void updateToDo(String title, String description, ParseUser currentUser, File photoFile, ToDo toDo) {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
-        query.getInBackground(toDo.getObjectId());
-
-        query.getInBackground(toDo.getObjectId(), (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            object.put("Title", title);
-            object.put("Content", description);
-            if (photoFile != null && ivPostImage.getDrawable() != null) {
-                object.put("Photo", new ParseFile(photoFile));
-            }
-            object.put("Username", currentUser);
-            object.saveInBackground();
-        });
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
     }
 }

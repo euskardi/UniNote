@@ -1,7 +1,9 @@
 package com.example.uninote.toDo;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,10 +12,24 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.uninote.MainActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.PhotoTaken;
+import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.models.ToDoFirebase;
+import com.example.uninote.models.UserHasReminder;
+import com.example.uninote.models.UserHasToDo;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -23,6 +39,9 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 
 public class ToDoDetailActivity extends PhotoTaken {
 
@@ -34,6 +53,12 @@ public class ToDoDetailActivity extends PhotoTaken {
     private ImageView ivPostImage;
     private Button btnSubmit;
     private Button btnShare;
+
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
+    private final ToDoFirebase toDoFirebase = new ToDoFirebase();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +74,8 @@ public class ToDoDetailActivity extends PhotoTaken {
         btnSubmit = findViewById(R.id.btnCreateToDo);
         btnShare = findViewById(R.id.btnLinkToDo);
 
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
 
         btnShare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +111,31 @@ public class ToDoDetailActivity extends PhotoTaken {
 
     }
 
+    private void uploadImage() {
+        final String randomKey = UUID.randomUUID().toString();
+        final StorageReference imageRef = storageReference.child("images/" + randomKey);
+
+        imageRef.putFile(fileProvider)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
+                        while (!urlTask.isSuccessful()) ;
+                        Log.i(TAG, String.valueOf(urlTask.getResult()));
+                        toDoFirebase.setUrl(String.valueOf(urlTask.getResult()));
+                        Toast.makeText(ToDoDetailActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ToDoDetailActivity.this, "No Uploaded", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+    }
+
     private void linkToDo(String code) {
         final ParseObject entity = new ParseObject("User_ToDo");
         entity.put("username", ParseUser.getCurrentUser());
@@ -113,46 +165,28 @@ public class ToDoDetailActivity extends PhotoTaken {
 
 
     private void saveToDo(String title, String description, ParseUser currentUser, File photoFile) {
-        final ToDo toDo = new ToDo();
-        toDo.setTitle(title);
-        toDo.setContent(description);
-        if (photoFile != null && ivPostImage.getDrawable() != null) {
-            toDo.setImage(new ParseFile(photoFile));
-        }
-        toDo.setUser(currentUser);
+        final UserHasToDo userHasToDo = new UserHasToDo(currentUser.getUsername(), title);
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
-        toDo.saveInBackground(new SaveCallback() {
+        toDoFirebase.setTitle(title);
+        toDoFirebase.setDescription(description);
+        toDoFirebase.setId(title);
+        if (photoFile != null) uploadImage();
+
+        rootNode = FirebaseDatabase.getInstance();
+
+        final Runnable r = new Runnable() {
             @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
-                    Toast.makeText(ToDoDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-                }
-                Log.i(TAG, "Post save was succesful!!");
-                etDescription.setText("");
-                ivPostImage.setImageResource(0);
+            public void run() {
+                reference = rootNode.getReference("ToDos");
+                reference.child(toDoFirebase.getTitle()).setValue(toDoFirebase);
+                reference = rootNode.getReference("UserHasToDo");
+                reference.child(ISO_8601_FORMAT.format(new Date())).setValue(userHasToDo);
             }
-        });
+        };
 
-        final ParseObject entity = new ParseObject("User_ToDo");
-        final ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
-        parseACL.setPublicReadAccess(true);
-        ParseUser.getCurrentUser().setACL(parseACL);
-
-        entity.put("username", currentUser);
-        entity.put("toDo", toDo);
-
-        entity.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(com.parse.ParseException e) {
-                if (e == null) {
-                    Log.i(TAG, "Post save was succesful!!");
-                    return;
-                }
-                Log.e(TAG, "Error while saving 2", e);
-                Toast.makeText(ToDoDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-            }
-        });
+        final Handler h = new Handler();
+        h.postDelayed(r, 5000);
 
         startActivity(new Intent(this, MainActivity.class));
         finish();

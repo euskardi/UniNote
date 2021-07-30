@@ -29,12 +29,13 @@ public class PhotoTaken extends AppCompatActivity {
     public File photoFile;
     public Bitmap takenImage;
     public ImageView ivPostImage;
+    public Uri fileProvider;
 
     public void launchCamera() {
         ivPostImage = findViewById(R.id.ivImageToDo);
         final Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         photoFile = getPhotoFileUri(photoFileName);
-        final Uri fileProvider = FileProvider.getUriForFile(PhotoTaken.this, "com.codepath.fileprovider.UniNote", photoFile);
+        fileProvider = FileProvider.getUriForFile(PhotoTaken.this, "com.codepath.fileprovider.UniNote", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
         if (intent.resolveActivity(PhotoTaken.this.getPackageManager()) != null) {
             startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);

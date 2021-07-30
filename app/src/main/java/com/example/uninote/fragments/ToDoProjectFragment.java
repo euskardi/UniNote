@@ -65,7 +65,7 @@ public class ToDoProjectFragment extends ToDoFragment {
 
         rvToDos = view.findViewById(R.id.rvToDos);
         allToDos = new ArrayList<>();
-        adapter = new ToDoAdapter(getContext(), allToDos, userType, getArguments().getParcelable("code"));
+        //adapter = new ToDoAdapter(getContext(), allToDos, userType, getArguments().getParcelable("code"));
         rvToDos.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvToDos.setLayoutManager(mLayoutManager);

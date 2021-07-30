@@ -15,11 +15,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.uninote.R;
+import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.ToDoFirebase;
+import com.example.uninote.models.UserHasReminder;
+import com.example.uninote.models.UserHasToDo;
 import com.example.uninote.toDo.ToDoDetailActivity;
 import com.example.uninote.models.ToDo;
 import com.example.uninote.toDo.ToDoAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -39,7 +50,10 @@ public class ToDoFragment extends Fragment {
     private LinearLayoutManager mLayoutManager;
     private ImageButton btnAdd;
     private ToDoAdapter adapter;
-    private List<ToDo> allToDos;
+    private List<ToDoFirebase> allToDos;
+
+    private DatabaseReference reference;
+
 
     public ToDoFragment() {
     }
@@ -78,31 +92,47 @@ public class ToDoFragment extends Fragment {
                 swipeContainer.setRefreshing(false);
             }
         });
+
+        reference = FirebaseDatabase.getInstance().getReference("ToDos");
+
         queryToDos();
     }
 
     private void queryToDos() {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
-        innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_ToDo");
-        query.whereMatchesQuery("username", innerQuery);
+        final Query query = FirebaseDatabase.getInstance().getReference("UserHasToDo")
+                .orderByChild("user")
+                .equalTo(ParseUser.getCurrentUser().getUsername());
 
-        query.findInBackground(new FindCallback<ParseObject>() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ParseObject> toDos, ParseException e) {
-                for (ParseObject toDo : toDos) {
-                    Log.i(TAG, "ToDo is good " + toDo.getParseObject("toDo").getObjectId());
-                    final ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
-                    query.whereEqualTo("objectId", toDo.getParseObject("toDo").getObjectId());
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
 
-                    query.findInBackground(new FindCallback<ToDo>() {
+                    final UserHasToDo userHasToDo = dataSnapshot.getValue(UserHasToDo.class);
+                    final Query innerQuery = FirebaseDatabase.getInstance().getReference("ToDos")
+                            .orderByKey()
+                            .equalTo(userHasToDo.getToDo());
+
+                    innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void done(List<ToDo> objects, ParseException e) {
-                            allToDos.addAll(objects);
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                allToDos.add(dataSnapshot.getValue(ToDoFirebase.class));
+                            }
                             adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
             }
         });
     }
