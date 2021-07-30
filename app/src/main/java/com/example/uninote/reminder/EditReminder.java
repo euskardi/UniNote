@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,14 @@ import com.example.uninote.R;
 import com.example.uninote.ShareContent;
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ReminderFirebase;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseGeoPoint;
@@ -36,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class EditReminder extends ButtonsReminder {
@@ -55,7 +65,8 @@ public class EditReminder extends ButtonsReminder {
     private final int month = calendar.get(Calendar.MONTH);
     private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private int hour, minutes;
-    private Reminder reminder;
+    private ReminderFirebase reminder;
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +82,24 @@ public class EditReminder extends ButtonsReminder {
         btnUbication = findViewById(R.id.btnUbication);
         btnCreateReminder = findViewById(R.id.btnCreateReminder);
 
-        reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
+        reminder = getIntent().getParcelableExtra(ReminderFirebase.class.getSimpleName());
 
         btnCreateReminder.setText("EDIT");
         etTitle.setText(reminder.getTitle());
-        etInputDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(reminder.getDate()));
-        etInputHour.setText(new SimpleDateFormat("HH:mm").format(reminder.getDate()));
-        final ParseGeoPoint location = reminder.getLocation();
+
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
+        Date date = new Date();
+
         try {
-            final List<Address> addresses = new Geocoder(this).getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            date = ISO_8601_FORMAT.parse(reminder.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        etInputDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(date));
+        etInputHour.setText(new SimpleDateFormat("HH:mm").format(date));
+        try {
+            final List<Address> addresses = new Geocoder(this).getFromLocation(reminder.getLatitude(), reminder.getLongitude(), 1);
             if (!addresses.isEmpty())
                 etInputUbication.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
 
@@ -128,7 +148,7 @@ public class EditReminder extends ButtonsReminder {
                 }
 
                 final ParseUser currentUser = ParseUser.getCurrentUser();
-                updateReminder(title, date, addresses, currentUser, reminder);
+                updateReminder(title, date, addresses, currentUser);
             }
         });
     }
@@ -165,61 +185,66 @@ public class EditReminder extends ButtonsReminder {
         }
     }
 
-    private void deleteReminder(Reminder reminder) {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("Reminder");
-        innerQuery.whereEqualTo("objectId", reminder.getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Reminder");
-        query.whereMatchesQuery("reminder", innerQuery);
-        query.findInBackground(new FindCallback<ParseObject>() {
+    private void deleteReminder(ReminderFirebase reminder) {
+        rootDatabase.child("Reminders").child(reminder.getId()).removeValue();
+
+        final Query innerQuery = FirebaseDatabase.getInstance().getReference("UserHasReminder")
+                .orderByChild("reminder")
+                .equalTo(reminder.getId());
+
+        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ParseObject> objects, com.parse.ParseException e) {
-                for (ParseObject object : objects) {
-                    object.deleteInBackground(new DeleteCallback() {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    final String key = dataSnapshot.getKey();
+                    rootDatabase.child("UserHasReminder").child(key).removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(EditReminder.this, "Error In Connection", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateReminder(String title, Date date, List<Address> addresses, ParseUser currentUser) {
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
+
+        final HashMap hashMap = new HashMap();
+        hashMap.put("title", title);
+        hashMap.put("date", ISO_8601_FORMAT.format(date));
+
+        if (!addresses.isEmpty()) {
+            hashMap.put("latitude", addresses.get(0).getLatitude());
+            hashMap.put("longitude", addresses.get(0).getLongitude());
+        } else {
+            hashMap.put("latitude", 0);
+            hashMap.put("longitude", 0);
+        }
+
+        final Query innerQuery = FirebaseDatabase.getInstance().getReference("Reminders")
+                .orderByChild("title")
+                .equalTo(reminder.getTitle());
+
+        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    final String key = dataSnapshot.getKey();
+                    rootDatabase.child("Reminders").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
                         @Override
-                        public void done(com.parse.ParseException e) {
-                            if (e != null) {
-                                Toast
-                                  .makeText(EditReminder.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT)
-                                  .show();
-                            }
+                        public void onSuccess(Object o) {
+                            Toast.makeText(EditReminder.this, "Your data is Successfully Updated", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             }
-        });
 
-        final ParseQuery<ParseObject> queryReminder = ParseQuery.getQuery("Reminder");
-        queryReminder.getInBackground(reminder.getObjectId(), (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(EditReminder.this, "Error In Connection", Toast.LENGTH_SHORT).show();
             }
-            object.deleteInBackground(e2 -> {
-                if (e2 == null) {
-                    Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
         });
-    }
-
-    private void updateReminder(String title, Date date, List<Address> addresses, ParseUser currentUser, Reminder reminder) {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("Reminder");
-        query.getInBackground(reminder.getObjectId());
-
-        query.getInBackground(reminder.getObjectId(), (object, e) -> {
-            object.put("Title", title);
-            object.put("Day", date);
-            if (!addresses.isEmpty()) {
-                object.put("Location", new ParseGeoPoint(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()));
-            } else {
-                object.put("Location", new ParseGeoPoint(0, 0));
-            }
-            object.put("Username", currentUser);
-            object.saveInBackground();
-        });
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
     }
 }

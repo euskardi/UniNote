@@ -170,6 +170,7 @@ public class ReminderDetailActivity extends ButtonsReminder {
         reminderFirebase.setDate(ISO_8601_FORMAT.format(date));
         reminderFirebase.setLatitude(location.getLatitude());
         reminderFirebase.setLongitude(location.getLongitude());
+        reminderFirebase.setId(title);
 
         rootNode = FirebaseDatabase.getInstance();
 

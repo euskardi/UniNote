@@ -103,7 +103,7 @@ public class ReminderFragment extends Fragment {
 
                     final UserHasReminder userHasReminder = dataSnapshot.getValue(UserHasReminder.class);
                     final Query innerQuery = FirebaseDatabase.getInstance().getReference("Reminders")
-                            .orderByChild("title")
+                            .orderByKey()
                             .equalTo(userHasReminder.getReminder());
 
                     innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
