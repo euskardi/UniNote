@@ -15,29 +15,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.uninote.R;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ReminderFirebase;
 import com.parse.ParseGeoPoint;
 
 import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<Reminder> Reminders;
+    private final List<ReminderFirebase> Reminders;
     private final boolean click;
     private Project project;
 
-    public ReminderAdapter(Context context, List<Reminder> Reminders, boolean click) {
+    public ReminderAdapter(Context context, List<ReminderFirebase> Reminders, boolean click) {
         this.context = context;
         this.Reminders = Reminders;
         this.click = click;
     }
 
-    public ReminderAdapter(Context context, List<Reminder> Reminders, boolean click, Project project) {
+    public ReminderAdapter(Context context, List<ReminderFirebase> Reminders, boolean click, Project project) {
         this.context = context;
         this.Reminders = Reminders;
         this.click = click;
@@ -81,14 +84,22 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Reminder reminder) {
+        public void bind(ReminderFirebase reminder) {
             tvTitle.setText(reminder.getTitle());
-            tvDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(reminder.getDate()));
-            tvTime.setText(new SimpleDateFormat("HH:mm").format(reminder.getDate()));
+            final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
+            Date date = new Date();
 
-            final ParseGeoPoint location = reminder.getLocation();
             try {
-                final List<Address> addresses = new Geocoder(context).getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                date = ISO_8601_FORMAT.parse(reminder.getDate());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            tvDate.setText(new SimpleDateFormat("MM/dd/yyyy").format(date));
+            tvTime.setText(new SimpleDateFormat("HH:mm").format(date));
+
+            try {
+                final List<Address> addresses = new Geocoder(context).getFromLocation(reminder.getLatitude(), reminder.getLongitude(), 1);
                 if (!addresses.isEmpty()) {
                     tvLocation.setText(addresses.get(0).getLocality() + ", " + addresses.get(0).getAdminArea());
                 }
@@ -104,7 +115,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             if (position == RecyclerView.NO_POSITION || !click) {
                 return;
             }
-            final Reminder reminder = Reminders.get(position);
+            final ReminderFirebase reminder = Reminders.get(position);
             if (project == null) {
                 final Intent intentProject = new Intent(context, EditReminder.class);
                 intentProject.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));

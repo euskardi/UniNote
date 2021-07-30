@@ -16,6 +16,11 @@ import com.example.uninote.MainActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.User;
+import com.example.uninote.models.UserHasReminder;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.parse.ParseACL;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -29,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class ReminderDetailActivity extends ButtonsReminder {
@@ -51,6 +57,9 @@ public class ReminderDetailActivity extends ButtonsReminder {
     private DatePickerDialog.OnDateSetListener setListener;
     private int hour, minutes;
     private Reminder reminder;
+
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,42 +161,22 @@ public class ReminderDetailActivity extends ButtonsReminder {
     }
 
     private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location) {
-        final Reminder reminder = new Reminder();
-        reminder.setTitle(title);
-        reminder.setDate(date);
-        reminder.setLocation(location);
-        reminder.setUser(currentUser);
 
-        reminder.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(com.parse.ParseException e) {
-                if (e == null) {
-                    return;
-                }
-                Log.e(TAG, "Error while saving", e);
-                Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-            }
-        });
+        final ReminderFirebase reminderFirebase = new ReminderFirebase();
+        final UserHasReminder userHasReminder = new UserHasReminder(currentUser.getUsername(), title);
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
-        final ParseObject entity = new ParseObject("User_Reminder");
-        final ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
-        parseACL.setPublicReadAccess(true);
-        ParseUser.getCurrentUser().setACL(parseACL);
+        reminderFirebase.setTitle(title);
+        reminderFirebase.setDate(ISO_8601_FORMAT.format(date));
+        reminderFirebase.setLatitude(location.getLatitude());
+        reminderFirebase.setLongitude(location.getLongitude());
 
-        entity.put("username", currentUser);
-        entity.put("reminder", reminder);
+        rootNode = FirebaseDatabase.getInstance();
 
-        entity.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(com.parse.ParseException e) {
-                if (e == null) {
-                    Log.i(TAG, "Post save was succesful!!");
-                    return;
-                }
-                Log.e(TAG, "Error while saving 2", e);
-                Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-            }
-        });
+        reference = rootNode.getReference("Reminders");
+        reference.child(reminderFirebase.getTitle()).setValue(reminderFirebase);
+        reference = rootNode.getReference("UserHasReminder");
+        reference.child(ISO_8601_FORMAT.format(new Date())).setValue(userHasReminder);
 
         startActivity(new Intent(this, MainActivity.class));
         finish();

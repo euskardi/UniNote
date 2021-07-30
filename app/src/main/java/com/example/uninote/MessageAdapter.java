@@ -1,18 +1,13 @@
 package com.example.uninote;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,6 +22,8 @@ import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
 
+    private static final int MESSAGE_ME = 1;
+    private static final int MESSAGE_OTHER = 0;
     public static final String TAG = "RecyclerView";
     private final Context context;
     private final List<Message> messages;
@@ -41,22 +38,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         try {
             final String messageUsername = messages.get(position).getSender().fetchIfNeeded().getUsername();
             if (messageUsername.equals(ParseUser.getCurrentUser().getUsername())) {
-                return 1;
+                return MESSAGE_ME;
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return 0;
+        return MESSAGE_OTHER;
     }
 
     @NonNull
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        if (viewType == 0) {
-            return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_message_me, parent, false));
-        }
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_message, parent, false));
+        return viewType == MESSAGE_OTHER
+                ? new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_message_other, parent, false))
+                : new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_message_me, parent, false));
     }
 
     @Override

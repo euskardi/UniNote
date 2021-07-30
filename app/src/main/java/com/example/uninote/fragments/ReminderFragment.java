@@ -15,11 +15,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.uninote.R;
+import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.reminder.ReminderAdapter;
 import com.example.uninote.reminder.ReminderDetailActivity;
 import com.example.uninote.models.Reminder;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -40,7 +49,7 @@ public class ReminderFragment extends Fragment {
     private LinearLayoutManager mLayoutManager;
     private ImageButton btnAdd;
     private ReminderAdapter adapter;
-    private List<Reminder> allReminders;
+    private List<ReminderFirebase> allReminders;
 
     public ReminderFragment() {
     }
@@ -82,29 +91,41 @@ public class ReminderFragment extends Fragment {
         queryReminders();
     }
 
-    //COMMENT FOR ME: Needs to search a better form to get the data
     private void queryReminders() {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
-        innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Reminder");
-        query.whereMatchesQuery("username", innerQuery);
+        final Query query = FirebaseDatabase.getInstance().getReference("UserHasReminder")
+                .orderByChild("user")
+                .equalTo(ParseUser.getCurrentUser().getUsername());
 
-        query.findInBackground(new FindCallback<ParseObject>() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ParseObject> reminders, ParseException e) {
-                for (ParseObject reminder : reminders) {
-                    Log.i(TAG, "Reminder is good " + reminder.getParseObject("reminder").getObjectId());
-                    final ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
-                    query.whereEqualTo("objectId", reminder.getParseObject("reminder").getObjectId());
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
 
-                    query.findInBackground(new FindCallback<Reminder>() {
+                    final UserHasReminder userHasReminder = dataSnapshot.getValue(UserHasReminder.class);
+                    final Query innerQuery = FirebaseDatabase.getInstance().getReference("Reminders")
+                            .orderByChild("title")
+                            .equalTo(userHasReminder.getReminder());
+
+                    innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void done(List<Reminder> objects, ParseException e) {
-                            allReminders.addAll(objects);
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                allReminders.add(dataSnapshot.getValue(ReminderFirebase.class));
+                            }
                             adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -64,7 +64,7 @@ public class ProjectFragment extends Fragment {
         btnAdd = view.findViewById(R.id.btnAdd);
         rvProjects = view.findViewById(R.id.rvProjects);
         allProjects = new ArrayList<>();
-        adapter = new ProjectAdapter(getContext(), allProjects); //dddddd
+        adapter = new ProjectAdapter(getContext(), allProjects);
         rvProjects.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvProjects.setLayoutManager(mLayoutManager);

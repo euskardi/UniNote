@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.example.uninote.R;
+import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.reminder.ReminderAdapter;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
@@ -41,7 +42,7 @@ public class ReminderProjectFragment extends ReminderFragment {
     private LinearLayoutManager mLayoutManager;
     private ImageButton btnAdd;
     private ReminderAdapter adapter;
-    private List<Reminder> allReminders;
+    private List<ReminderFirebase> allReminders;
 
     public ReminderProjectFragment() {
     }
@@ -124,7 +125,7 @@ public class ReminderProjectFragment extends ReminderFragment {
         query.findInBackground(new FindCallback<Reminder>() {
             @Override
             public void done(List<Reminder> reminders, ParseException e) {
-                allReminders.addAll(reminders);
+                //allReminders.addAll(reminders); error this function has to be updated in the next commit
                 adapter.notifyDataSetChanged();
             }
         });
