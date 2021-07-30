@@ -24,61 +24,61 @@ Is an application to manager and share your everyday tasks that can be reminders
 
 ### 1. User Stories (Required and Optional)
 
-**Required Must-have Stories**
+**MVP Stories**
 
 * Users can view their list of ToDo and Reminders (Medium) 
+
 * Users can CRUD a ToDo or Reminder (Large)
   * User can create a ToDo or Reminder
   * User can delete a ToDo or Reminder
   * User can edit a ToDo or Reminder
+  * User can read a ToDo or Reminder
+  
+* Users can CRUD a Project(Large)
+  * User can create a Project
+  * User can delete a Project
+  * User can edit a Project
+  * User can read a Project
+  
+* Users can talk with other members of the Project
+* Users can see the members of the Project
 * Users can Log In (Small)
 * Users can Log Out (Small)
 * Users can Sign Up (Small)
-* Users can flag an important content (Small)
 * Users can navigate between fragments with a bottom navigation view (Small)
+* Users can see app icon in home screen (Small)
 
-**Right after the MVP**
+* Users can share their content with other users (Large)
+  * User can share Reminders
+  * User can share Projects 
+  
+* The share content can be in lector or editor mode (Medium)
+* Users can pull to refresh the inbox (Small)
+* Users can implement text, photos and locations in the content (Medium) 
 
+
+**Optional Nice-to-have Stories**
+
+* Users can flag an important content (Small)
+* the user can assign and remove ToDo's to a category (Medium)
+* User can filter the ToDo's by category or flag (Large)
+* Users can share ToDos via Twitter and Facebook (Large)
+* User can filter the ToDo's by category or flag (Large)
 * User can CRUD categories of ToDo (Medium)
   * User can create a category
   * User can delete a category
   * User can edit a category
 * The reminders can create notifications (Large)
 
-**Optional Nice-to-have Stories**
 
-* Users can see app icon in home screen (Small)
-* Users can implement text, photos and locations in the content (Medium) 
-* the user can assign and remove ToDo's to a category (Medium)
-* User can filter the ToDo's by category or flag (Large)
-* Users can pull to refresh the inbox (Small)
-* The share content can be in lector or editor mode (Medium)
-* Users can select between different types of text (bullet points, list, plain, etc) in the content (Medium)
-* Users can share their content with other users (Large)
-* Users can share ToDos via Twitter and Facebook (Large)
-* User can filter the ToDo's by category or flag (Large)
-
-
-Updating below
-
-### 2. Screen Archetypes
-
-* [list first screen here]
-   * [list associated required story here]
-   * ...
-* [list second screen here]
-   * [list associated required story here]
-   * ...
-
-
-### 3. Navigation
+### 2. Navigation
 
 
 **Tab Navigation** (Tab to Screen)
 
 * Reminders
 * ToDo's
-* Shared Documents
+* Projects
 * User Settings
 
 **Flow Navigation** (Screen to Screen)
@@ -92,8 +92,13 @@ Updating below
    * Edit/Create Reminder
    * Share Document
 * Shared Documents Screen
-   * Edit Online Reminder
-   * Edit Online ToDo
+   * Edit/Create Reminder
+   * Project Screen
+     * Reminders Project Screen 
+     * ToDos porject Screen
+     * Message Screen
+     * Directory Screen
+     * Profile Screen
 * Profile Screen
    * Camera fragment
  
