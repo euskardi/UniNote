@@ -82,6 +82,7 @@ public class EditToDo extends PhotoTaken {
         etDescription = findViewById(R.id.etInputDescription);
         btnCaptureImage = findViewById(R.id.btnPhoto);
         ivPostImage = findViewById(R.id.ivImageToDo);
+
         btnSubmit = findViewById(R.id.btnCreateToDo);
 
         toDo = getIntent().getParcelableExtra(ToDoFirebase.class.getSimpleName());
@@ -92,11 +93,7 @@ public class EditToDo extends PhotoTaken {
         tvName.setText("Edit ToDo");
         etTitle.setText(toDo.getTitle());
         etDescription.setText(toDo.getDescription());
-        try {
-            Glide.with(this).load(toDo.getUrl()).into(ivPostImage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         btnSubmit.setText("EDIT");
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +106,6 @@ public class EditToDo extends PhotoTaken {
                     return;
                 }
                 final ParseUser currentUser = ParseUser.getCurrentUser();
-
                 updateToDo(title, description, currentUser, photoFile);
             }
         });
@@ -205,14 +201,18 @@ public class EditToDo extends PhotoTaken {
     }
 
     private void updateToDo(String title, String description, ParseUser currentUser, File photoFile) {
-        uploadImage();
         final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
         final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
         final HashMap hashMap = new HashMap();
         hashMap.put("title", title);
         hashMap.put("description", description);
-        hashMap.put("url", toDoFirebase);
+
+
+        if (photoFile != null && ivPostImage.getDrawable() != null) {
+            uploadImage();
+            hashMap.put("url", toDoFirebase.getUrl());
+        }
 
         final Query innerQuery = FirebaseDatabase.getInstance().getReference("ToDos")
                 .orderByChild("title")
