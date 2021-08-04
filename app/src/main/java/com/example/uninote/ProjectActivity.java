@@ -18,6 +18,8 @@ import com.example.uninote.fragments.ShareFragment;
 import com.example.uninote.fragments.ToDoFragment;
 import com.example.uninote.fragments.ToDoProjectFragment;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
+import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseACL;
@@ -31,7 +33,6 @@ public class ProjectActivity extends AppCompatActivity {
     public final static String TAG = "Project";
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private BottomNavigationView bottomNavigationView;
-    private Project project;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,7 @@ public class ProjectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_project);
         bottomNavigationView = findViewById(R.id.bottomNavigation);
 
-        project = Parcels.unwrap(getIntent().getParcelableExtra(Project.class.getSimpleName()));
+        final ProjectFirebase project = getIntent().getParcelableExtra(ProjectFirebase.class.getSimpleName());
         final Bundle args = new Bundle();
         args.putParcelable("code", project);
 

@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
+import com.example.uninote.models.ToDoFirebase;
+import com.example.uninote.toDo.EditToDo;
 import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,15 +24,12 @@ import java.util.List;
 public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<Project> projects;
+    private final List<ProjectFirebase> projects;
 
-
-    public ProjectAdapter(Context context, List<Project> projects) {
+    public ProjectAdapter(Context context, List<ProjectFirebase> projects) {
         this.context = context;
         this.projects = projects;
-
     }
-
 
     @NonNull
     @Override
@@ -68,11 +68,11 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Project project) {
-            tvTitle.setText(project.getTitle());
+        public void bind(ProjectFirebase project) {
+            tvTitle.setText(project.getName());
             tvDescription.setText(project.getDescription());
-            tvReminders.setText("Reminders: " + project.getCountReminders());
-            tvToDos.setText("ToDos: " + project.getCountTodos());
+            tvReminders.setText("Reminders: " + project.getCountReminders());//project.getCountReminders());
+            tvToDos.setText("ToDos: " + project.getCountTodos());//project.getCountTodos());
         }
 
         @Override
@@ -81,9 +81,10 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
             if (position == RecyclerView.NO_POSITION) {
                 return;
             }
-            final Project project = projects.get(position);
+
+            final ProjectFirebase project = projects.get(position);
             final Intent intent = new Intent(context, ProjectActivity.class);
-            intent.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+            intent.putExtra(ProjectFirebase.class.getSimpleName(), project);
             context.startActivity(intent);
         }
     }

@@ -8,6 +8,7 @@ public class ReminderFirebase implements Parcelable {
     private String id;
     private String title;
     private String date;
+    private String project;
     private double latitude;
     private double longitude;
 
@@ -81,6 +82,14 @@ public class ReminderFirebase implements Parcelable {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
     }
 
     @Override

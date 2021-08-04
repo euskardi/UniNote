@@ -21,9 +21,18 @@ import com.example.uninote.ProjectAdapter;
 import com.example.uninote.ProjectDetailActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.UserHasProject;
+import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.reminder.ReminderDetailActivity;
 import com.example.uninote.reminder.ReminderDetailProject;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -45,9 +54,7 @@ public class ProjectFragment extends Fragment {
     private LinearLayoutManager mLayoutManager;
     private ImageButton btnAdd;
     private ProjectAdapter adapter;
-    private List<Project> allProjects;
-    private int countReminders;
-    private int countToDos;
+    private List<ProjectFirebase> allProjects;
 
     public ProjectFragment() {
     }
@@ -91,52 +98,43 @@ public class ProjectFragment extends Fragment {
     }
 
     private void queryProjects() {
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("_User");
-        innerQuery.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Project");
-        query.whereMatchesQuery("username", innerQuery);
 
-        query.findInBackground(new FindCallback<ParseObject>() {
+        final Query query = FirebaseDatabase.getInstance().getReference("UserHasProject")
+                .orderByChild("user")
+                .equalTo(ParseUser.getCurrentUser().getUsername());
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ParseObject> projects, ParseException e) {
-                for (ParseObject project : projects) {
-                    Log.i(TAG, "Reminder is good " + project.getParseObject("project").getObjectId());
-                    final ParseQuery<Project> query = ParseQuery.getQuery("Project");
-                    query.whereEqualTo("objectId", project.getParseObject("project").getObjectId());
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                    query.findInBackground(new FindCallback<Project>() {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                    final UserHasProject userHasProject = dataSnapshot.getValue(UserHasProject.class);
+                    final Query innerQuery = FirebaseDatabase.getInstance().getReference("Project")
+                            .orderByKey()
+                            .equalTo(userHasProject.getProject());
+
+                    innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void done(List<Project> objects, ParseException e) {
-                            for (Project object : objects) {
-                                queryCount(object);
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                allProjects.add(dataSnapshot.getValue(ProjectFirebase.class));
                             }
-                            allProjects.addAll(objects);
                             adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
+            }
         });
-    }
-
-    private void queryCount(Project project) {
-        final ParseQuery<Project> innerQuery = ParseQuery.getQuery("Project");
-        innerQuery.whereEqualTo("objectId", project.getObjectId());
-
-        final ParseQuery<ParseObject> queryReminder = ParseQuery.getQuery("Reminder");
-        queryReminder.whereMatchesQuery("Project", innerQuery);
-        try {
-            project.setCountReminders(queryReminder.count());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        final ParseQuery<ParseObject> queryToDo = ParseQuery.getQuery("ToDo");
-        queryToDo.whereMatchesQuery("Project", innerQuery);
-        try {
-            project.setCountTodos(queryToDo.count());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
     }
 }

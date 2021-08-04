@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.uninote.R;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
 import com.parse.ParseGeoPoint;
@@ -32,7 +33,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     private final Context context;
     private final List<ReminderFirebase> Reminders;
     private final boolean click;
-    private Project project;
+    private ProjectFirebase project;
 
     public ReminderAdapter(Context context, List<ReminderFirebase> Reminders, boolean click) {
         this.context = context;
@@ -40,7 +41,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
         this.click = click;
     }
 
-    public ReminderAdapter(Context context, List<ReminderFirebase> Reminders, boolean click, Project project) {
+    public ReminderAdapter(Context context, List<ReminderFirebase> Reminders, boolean click, ProjectFirebase project) {
         this.context = context;
         this.Reminders = Reminders;
         this.click = click;
@@ -124,7 +125,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
             }
             final Intent intent = new Intent(context, EditReminderProject.class);
             intent.putExtra(ReminderFirebase.class.getSimpleName(), reminder);
-            intent.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+            intent.putExtra(ProjectFirebase.class.getSimpleName(), project);
             context.startActivity(intent);
         }
     }
