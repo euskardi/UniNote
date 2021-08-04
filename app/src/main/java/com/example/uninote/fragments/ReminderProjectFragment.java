@@ -13,14 +13,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.uninote.R;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.reminder.EditReminder;
 import com.example.uninote.reminder.ReminderAdapter;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.Reminder;
 import com.example.uninote.reminder.ReminderDetailProject;
 import com.example.uninote.toDo.ToDoDetailProject;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -31,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -43,6 +54,8 @@ public class ReminderProjectFragment extends ReminderFragment {
     private ImageButton btnAdd;
     private ReminderAdapter adapter;
     private List<ReminderFirebase> allReminders;
+
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
     public ReminderProjectFragment() {
     }
@@ -84,10 +97,11 @@ public class ReminderProjectFragment extends ReminderFragment {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Project project = getArguments().getParcelable("code");
+                final ProjectFirebase project = getArguments().getParcelable("code");
                 final Intent intent = new Intent(getContext(), ReminderDetailProject.class);
-                intent.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                intent.putExtra(ProjectFirebase.class.getSimpleName(), project);
                 getContext().startActivity(intent);
+
             }
         });
 
@@ -95,39 +109,31 @@ public class ReminderProjectFragment extends ReminderFragment {
     }
 
     private boolean viewType() {
-        final Project project = getArguments().getParcelable("code");
-
-        final ParseQuery<ParseUser> innerQueryOne = ParseQuery.getQuery("_User");
-        innerQueryOne.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ParseUser> innerQueryTwo = ParseQuery.getQuery("Project");
-        innerQueryTwo.whereEqualTo("objectId", project.getObjectId());
-
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Project");
-        query.whereMatchesQuery("username", innerQueryOne);
-        query.whereMatchesQuery("project", innerQueryTwo);
-
-        try {
-            ParseObject object = query.getFirst();
-            return object.getBoolean("type");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        if (project.getEditor().equals(ParseUser.getCurrentUser().getUsername())) return true;
         return false;
     }
 
     private void queryReminders() {
-        final Project project = getArguments().getParcelable("code");
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("Project");
-        innerQuery.whereEqualTo("objectId", project.getObjectId());
-        final ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
-        query.whereMatchesQuery("Project", innerQuery);
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        final Query query = FirebaseDatabase.getInstance().getReference("Reminders")
+                .orderByChild("project")
+                .equalTo(project.getName());
 
-        query.findInBackground(new FindCallback<Reminder>() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<Reminder> reminders, ParseException e) {
-                //allReminders.addAll(reminders); error this function has to be updated in the next commit
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    allReminders.add(dataSnapshot.getValue(ReminderFirebase.class));
+                }
                 adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Internet Connection Error", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 }

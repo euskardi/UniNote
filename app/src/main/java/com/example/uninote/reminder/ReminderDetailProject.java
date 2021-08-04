@@ -12,12 +12,23 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.uninote.MainActivity;
 import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ReminderFirebase;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.ParseACL;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -33,7 +44,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 public class ReminderDetailProject extends ButtonsReminder {
 
@@ -53,7 +67,11 @@ public class ReminderDetailProject extends ButtonsReminder {
     private DatePickerDialog.OnDateSetListener setListener;
     private int hour, minutes;
     private Reminder reminder;
-    private Project project;
+    private ProjectFirebase project;
+
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +87,7 @@ public class ReminderDetailProject extends ButtonsReminder {
         btnUbication = findViewById(R.id.btnUbication);
         btnCreateReminder = findViewById(R.id.btnCreateReminder);
 
-        project = Parcels.unwrap(getIntent().getParcelableExtra(Project.class.getSimpleName()));
+        project = getIntent().getParcelableExtra(ProjectFirebase.class.getSimpleName());
 
         settingButtons(ReminderDetailProject.this);
 
@@ -110,33 +128,60 @@ public class ReminderDetailProject extends ButtonsReminder {
                     return;
                 }
                 final ParseUser currentUser = ParseUser.getCurrentUser();
-                saveReminder(title, currentUser, date, location);
+                saveReminder(title, currentUser, date, location, project.getName());
             }
         });
     }
 
-    private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location) {
-        final Reminder reminder = new Reminder();
-        reminder.setTitle(title);
-        reminder.setDate(date);
-        reminder.setLocation(location);
-        reminder.setUser(currentUser);
-        reminder.setProject(project);
+    private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location, String projectName) {
 
-        reminder.saveInBackground(new SaveCallback() {
+        final ReminderFirebase reminderFirebase = new ReminderFirebase();
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
+
+        reminderFirebase.setTitle(title);
+        reminderFirebase.setDate(ISO_8601_FORMAT.format(date));
+        reminderFirebase.setLatitude(location.getLatitude());
+        reminderFirebase.setLongitude(location.getLongitude());
+        reminderFirebase.setId(title);
+        reminderFirebase.setProject(projectName);
+
+        rootNode = FirebaseDatabase.getInstance();
+
+        reference = rootNode.getReference("Reminders");
+        reference.child(reminderFirebase.getTitle()).setValue(reminderFirebase);
+        updateScore();
+
+    }
+
+    private void updateScore() {
+
+        final HashMap hashMap = new HashMap();
+        hashMap.put("countReminders", project.getCountReminders() + 1);
+
+        final Query innerQuery = FirebaseDatabase.getInstance().getReference("Project")
+                .orderByChild("name")
+                .equalTo(project.getName());
+
+        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(com.parse.ParseException e) {
-                if (e == null) {
-                    return;
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    final String key = dataSnapshot.getKey();
+                    rootDatabase.child("Project").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
+                        @Override
+                        public void onSuccess(Object o) {
+                            startActivity(new Intent(ReminderDetailProject.this, ProjectActivity.class));
+                            finish();
+                        }
+                    });
                 }
-                Log.e(TAG, "Error while saving", e);
-                Toast.makeText(ReminderDetailProject.this, "Error while saving", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ReminderDetailProject.this, "Error In Connection", Toast.LENGTH_SHORT).show();
             }
         });
-
-        final Intent intentProject = new Intent(this, ProjectActivity.class);
-        intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
-        this.startActivity(intentProject);
-        finish();
     }
+
 }
