@@ -69,7 +69,6 @@ public class EditToDo extends PhotoTaken {
     private StorageReference storageReference;
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
-    private final ToDoFirebase toDoFirebase = new ToDoFirebase();
 
 
     @Override
@@ -106,7 +105,7 @@ public class EditToDo extends PhotoTaken {
                     return;
                 }
                 final ParseUser currentUser = ParseUser.getCurrentUser();
-                updateToDo(title, description, currentUser, photoFile);
+                updateToDo(title, description, currentUser, photoFile, toDo, EditToDo.this);
             }
         });
 
@@ -116,31 +115,6 @@ public class EditToDo extends PhotoTaken {
                 launchCamera();
             }
         });
-    }
-
-    private void uploadImage() {
-        final String randomKey = UUID.randomUUID().toString();
-        final StorageReference imageRef = storageReference.child("images/" + randomKey);
-
-        imageRef.putFile(fileProvider)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
-                        while (!urlTask.isSuccessful()) ;
-                        Log.i(TAG, String.valueOf(urlTask.getResult()));
-                        toDoFirebase.setUrl(String.valueOf(urlTask.getResult()));
-                        Toast.makeText(EditToDo.this, "Uploaded", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(EditToDo.this, "No Uploaded", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-
     }
 
 
@@ -190,45 +164,6 @@ public class EditToDo extends PhotoTaken {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     final String key = dataSnapshot.getKey();
                     rootDatabase.child("UserHasToDo").child(key).removeValue();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(EditToDo.this, "Error In Connection", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void updateToDo(String title, String description, ParseUser currentUser, File photoFile) {
-        final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
-        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
-
-        final HashMap hashMap = new HashMap();
-        hashMap.put("title", title);
-        hashMap.put("description", description);
-
-
-        if (photoFile != null && ivPostImage.getDrawable() != null) {
-            uploadImage();
-            hashMap.put("url", toDoFirebase.getUrl());
-        }
-
-        final Query innerQuery = FirebaseDatabase.getInstance().getReference("ToDos")
-                .orderByChild("title")
-                .equalTo(toDo.getTitle());
-
-        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    final String key = dataSnapshot.getKey();
-                    rootDatabase.child("ToDos").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
-                        @Override
-                        public void onSuccess(Object o) {
-                            Toast.makeText(EditToDo.this, "Your data is Successfully Updated", Toast.LENGTH_SHORT).show();
-                        }
-                    });
                 }
             }
 

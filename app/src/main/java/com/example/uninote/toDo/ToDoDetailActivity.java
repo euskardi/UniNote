@@ -58,7 +58,6 @@ public class ToDoDetailActivity extends PhotoTaken {
     private StorageReference storageReference;
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
-    private final ToDoFirebase toDoFirebase = new ToDoFirebase();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,31 +110,6 @@ public class ToDoDetailActivity extends PhotoTaken {
 
     }
 
-    private void uploadImage() {
-        final String randomKey = UUID.randomUUID().toString();
-        final StorageReference imageRef = storageReference.child("images/" + randomKey);
-
-        imageRef.putFile(fileProvider)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
-                        while (!urlTask.isSuccessful()) ;
-                        Log.i(TAG, String.valueOf(urlTask.getResult()));
-                        toDoFirebase.setUrl(String.valueOf(urlTask.getResult()));
-                        Toast.makeText(ToDoDetailActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ToDoDetailActivity.this, "No Uploaded", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-
-    }
-
     private void linkToDo(String code) {
         final ParseObject entity = new ParseObject("User_ToDo");
         entity.put("username", ParseUser.getCurrentUser());
@@ -171,7 +145,7 @@ public class ToDoDetailActivity extends PhotoTaken {
         toDoFirebase.setTitle(title);
         toDoFirebase.setDescription(description);
         toDoFirebase.setId(title);
-        if (photoFile != null) uploadImage();
+        if (photoFile != null) uploadImage(ToDoDetailActivity.this);
 
         rootNode = FirebaseDatabase.getInstance();
 

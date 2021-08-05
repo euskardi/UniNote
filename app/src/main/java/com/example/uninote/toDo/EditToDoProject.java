@@ -21,7 +21,17 @@ import com.example.uninote.R;
 import com.example.uninote.ShareContent;
 import com.example.uninote.models.PhotoTaken;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.models.ToDoFirebase;
+import com.example.uninote.reminder.EditReminderProject;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseFile;
@@ -33,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 public class EditToDoProject extends PhotoTaken {
@@ -43,8 +54,10 @@ public class EditToDoProject extends PhotoTaken {
     private ImageButton btnCaptureImage;
     private ImageView ivPostImage;
     private Button btnSubmit;
-    private ToDo toDo;
-    private Project project;
+    private ToDoFirebase toDo;
+    private ProjectFirebase project;
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +71,14 @@ public class EditToDoProject extends PhotoTaken {
         ivPostImage = findViewById(R.id.ivImageToDo);
         btnSubmit = findViewById(R.id.btnCreateToDo);
 
-        toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
-        project = Parcels.unwrap(getIntent().getParcelableExtra(Project.class.getSimpleName()));
+        toDo = getIntent().getParcelableExtra(ToDoFirebase.class.getSimpleName());
+        project = getIntent().getParcelableExtra(ProjectFirebase.class.getSimpleName());
 
         tvName.setText("Edit ToDo");
         etTitle.setText(toDo.getTitle());
-        etDescription.setText(toDo.getContent());
+        etDescription.setText(toDo.getDescription());
         try {
-            Glide.with(this).load(toDo.getImage().getUrl()).into(ivPostImage);
+            Glide.with(this).load(toDo.getUrl()).into(ivPostImage);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,7 +95,7 @@ public class EditToDoProject extends PhotoTaken {
                 }
                 final ParseUser currentUser = ParseUser.getCurrentUser();
 
-                updateToDo(title, description, currentUser, photoFile, toDo);
+                updateToDo(title, description, currentUser, photoFile, toDo, EditToDoProject.this);
             }
         });
 
@@ -107,13 +120,10 @@ public class EditToDoProject extends PhotoTaken {
         switch (item.getItemId()) {
             case R.id.delete:
                 deleteToDo(toDo);
-                intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
-                this.startActivity(intentProject);
-                finish();
                 return true;
 
             case R.id.cancel:
-                intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                intentProject.putExtra(ProjectFirebase.class.getSimpleName(), project);
                 this.startActivity(intentProject);
                 finish();
                 return true;
@@ -123,40 +133,10 @@ public class EditToDoProject extends PhotoTaken {
         }
     }
 
-    private void deleteToDo(ToDo toDo) {
-        final ParseQuery<ToDo> queryToDo = ParseQuery.getQuery("ToDo");
-        queryToDo.getInBackground(toDo.getObjectId(), (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            object.deleteInBackground(e2 -> {
-                if (e2 == null) {
-                    Toast.makeText(this, "Delete Successful", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Toast.makeText(this, "Error: " + e2.getMessage(), Toast.LENGTH_SHORT).show();
-            });
-        });
+    private void deleteToDo(ToDoFirebase toDo) {
+        rootDatabase.child("ToDos").child(toDo.getId()).removeValue();
+        updateScore(false, project, EditToDoProject.this);
+
     }
 
-    private void updateToDo(String title, String description, ParseUser currentUser, File photoFile, ToDo toDo) {
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("ToDo");
-        query.getInBackground(toDo.getObjectId());
-
-        query.getInBackground(toDo.getObjectId(), (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            object.put("Title", title);
-            object.put("Content", description);
-            if (photoFile != null && ivPostImage.getDrawable() != null) {
-                object.put("Photo", new ParseFile(photoFile));
-            }
-            object.put("Username", currentUser);
-            object.saveInBackground();
-        });
-        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
-    }
 }

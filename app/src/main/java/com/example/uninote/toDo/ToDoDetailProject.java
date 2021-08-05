@@ -66,7 +66,6 @@ public class ToDoDetailProject extends PhotoTaken {
     private StorageReference storageReference;
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
-    private final ToDoFirebase toDoFirebase = new ToDoFirebase();
     private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
     @Override
@@ -108,37 +107,12 @@ public class ToDoDetailProject extends PhotoTaken {
 
     }
 
-    private void uploadImage() {
-        final String randomKey = UUID.randomUUID().toString();
-        final StorageReference imageRef = storageReference.child("images/" + randomKey);
-
-        imageRef.putFile(fileProvider)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
-                        while (!urlTask.isSuccessful()) ;
-                        Log.i(TAG, String.valueOf(urlTask.getResult()));
-                        toDoFirebase.setUrl(String.valueOf(urlTask.getResult()));
-                        Toast.makeText(ToDoDetailProject.this, "Uploaded", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ToDoDetailProject.this, "No Uploaded", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-    }
-
-
     private void saveToDo(String title, String description, ParseUser currentUser, File photoFile, String name) {
         toDoFirebase.setTitle(title);
         toDoFirebase.setDescription(description);
         toDoFirebase.setId(title);
         toDoFirebase.setProject(name);
-        if (photoFile != null) uploadImage();
+        if (photoFile != null) uploadImage(ToDoDetailProject.this);
 
         rootNode = FirebaseDatabase.getInstance();
 
@@ -152,42 +126,7 @@ public class ToDoDetailProject extends PhotoTaken {
 
         final Handler h = new Handler();
         h.postDelayed(r, 5000);
-        updateScore();
-    }
-
-    private void updateScore() {
-
-        final Intent intentProject = new Intent(this, ProjectActivity.class);
-        intentProject.putExtra(ProjectFirebase.class.getSimpleName(), project);
-
-        final HashMap hashMap = new HashMap();
-        project.setCountTodos(project.getCountTodos() + 1);
-        hashMap.put("countTodos", project.getCountTodos());
-
-        final Query innerQuery = FirebaseDatabase.getInstance().getReference("Project")
-                .orderByChild("name")
-                .equalTo(project.getName());
-
-        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    final String key = dataSnapshot.getKey();
-                    rootDatabase.child("Project").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
-                        @Override
-                        public void onSuccess(Object o) {
-                            startActivity(new Intent(ToDoDetailProject.this, ProjectActivity.class));
-                            finish();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ToDoDetailProject.this, "Error In Connection", Toast.LENGTH_SHORT).show();
-            }
-        });
+        updateScore(true, project, ToDoDetailProject.this);
     }
 
 }
