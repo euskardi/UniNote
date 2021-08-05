@@ -149,39 +149,7 @@ public class ReminderDetailProject extends ButtonsReminder {
 
         reference = rootNode.getReference("Reminders");
         reference.child(reminderFirebase.getTitle()).setValue(reminderFirebase);
-        updateScore();
+        updateScore(true, project, ReminderDetailProject.this);
 
     }
-
-    private void updateScore() {
-
-        final HashMap hashMap = new HashMap();
-        hashMap.put("countReminders", project.getCountReminders() + 1);
-
-        final Query innerQuery = FirebaseDatabase.getInstance().getReference("Project")
-                .orderByChild("name")
-                .equalTo(project.getName());
-
-        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    final String key = dataSnapshot.getKey();
-                    rootDatabase.child("Project").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
-                        @Override
-                        public void onSuccess(Object o) {
-                            startActivity(new Intent(ReminderDetailProject.this, ProjectActivity.class));
-                            finish();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ReminderDetailProject.this, "Error In Connection", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
 }

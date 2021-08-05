@@ -148,7 +148,7 @@ public class EditReminder extends ButtonsReminder {
                 }
 
                 final ParseUser currentUser = ParseUser.getCurrentUser();
-                updateReminder(title, date, addresses, currentUser);
+                updateReminder(reminder, title, date, addresses, currentUser, EditReminder.this);
             }
         });
     }
@@ -198,46 +198,6 @@ public class EditReminder extends ButtonsReminder {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     final String key = dataSnapshot.getKey();
                     rootDatabase.child("UserHasReminder").child(key).removeValue();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(EditReminder.this, "Error In Connection", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void updateReminder(String title, Date date, List<Address> addresses, ParseUser currentUser) {
-        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
-
-        final HashMap hashMap = new HashMap();
-        hashMap.put("title", title);
-        hashMap.put("date", ISO_8601_FORMAT.format(date));
-
-        if (!addresses.isEmpty()) {
-            hashMap.put("latitude", addresses.get(0).getLatitude());
-            hashMap.put("longitude", addresses.get(0).getLongitude());
-        } else {
-            hashMap.put("latitude", 0);
-            hashMap.put("longitude", 0);
-        }
-
-        final Query innerQuery = FirebaseDatabase.getInstance().getReference("Reminders")
-                .orderByChild("title")
-                .equalTo(reminder.getTitle());
-
-        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    final String key = dataSnapshot.getKey();
-                    rootDatabase.child("Reminders").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
-                        @Override
-                        public void onSuccess(Object o) {
-                            Toast.makeText(EditReminder.this, "Your data is Successfully Updated", Toast.LENGTH_SHORT).show();
-                        }
-                    });
                 }
             }
 

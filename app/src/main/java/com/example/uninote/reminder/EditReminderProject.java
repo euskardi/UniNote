@@ -78,8 +78,6 @@ public class EditReminderProject extends ButtonsReminder {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder_detail);
 
-        Log.i("ss", "ss");
-
         etTitle = findViewById(R.id.etInputTitle);
         etInputDate = findViewById(R.id.etInputDate);
         etInputHour = findViewById(R.id.etInputHour);
@@ -156,7 +154,7 @@ public class EditReminderProject extends ButtonsReminder {
                 }
 
                 final ParseUser currentUser = ParseUser.getCurrentUser();
-                updateReminder(title, date, addresses, currentUser);
+                updateReminder(reminder, title, date, addresses, currentUser, EditReminderProject.this);
             }
         });
     }
@@ -188,74 +186,7 @@ public class EditReminderProject extends ButtonsReminder {
 
     private void deleteReminder(ReminderFirebase reminder) {
         rootDatabase.child("Reminders").child(reminder.getId()).removeValue();
-
-        final HashMap hashMap = new HashMap();
-        hashMap.put("countReminders", project.getCountReminders() - 1);
-
-        final Query innerQuery = FirebaseDatabase.getInstance().getReference("Project")
-                .orderByChild("name")
-                .equalTo(project.getName());
-
-        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    final String key = dataSnapshot.getKey();
-                    rootDatabase.child("Project").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
-                        @Override
-                        public void onSuccess(Object o) {
-                            final Intent intentProject = new Intent(EditReminderProject.this, ProjectActivity.class);
-                            intentProject.putExtra(ProjectFirebase.class.getSimpleName(), project);
-                            startActivity(intentProject);
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(EditReminderProject.this, "Error In Connection", Toast.LENGTH_SHORT).show();
-            }
-        });
+        updateScore(false, project, EditReminderProject.this);
     }
 
-    private void updateReminder(String title, Date date, List<Address> addresses, ParseUser currentUser) {
-        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
-
-        final HashMap hashMap = new HashMap();
-        hashMap.put("title", title);
-        hashMap.put("date", ISO_8601_FORMAT.format(date));
-
-        if (!addresses.isEmpty()) {
-            hashMap.put("latitude", addresses.get(0).getLatitude());
-            hashMap.put("longitude", addresses.get(0).getLongitude());
-        } else {
-            hashMap.put("latitude", 0);
-            hashMap.put("longitude", 0);
-        }
-
-        final Query innerQuery = FirebaseDatabase.getInstance().getReference("Reminders")
-                .orderByChild("title")
-                .equalTo(reminder.getTitle());
-
-        innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    final String key = dataSnapshot.getKey();
-                    rootDatabase.child("Reminders").child(key).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
-                        @Override
-                        public void onSuccess(Object o) {
-                            Toast.makeText(EditReminderProject.this, "Your data is Successfully Updated", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(EditReminderProject.this, "Error In Connection", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }
