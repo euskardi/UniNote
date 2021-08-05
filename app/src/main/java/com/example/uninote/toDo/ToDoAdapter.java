@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.uninote.R;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
 import com.example.uninote.models.ToDoFirebase;
@@ -29,7 +30,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
     private final Context context;
     private final List<ToDoFirebase> toDos;
     private final boolean click;
-    private Project project;
+    private ProjectFirebase project;
 
     public ToDoAdapter(Context context, List<ToDoFirebase> toDos, boolean click) {
         this.context = context;
@@ -37,7 +38,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         this.click = click;
     }
 
-    public ToDoAdapter(Context context, List<ToDoFirebase> toDos, boolean click, Project project) {
+    public ToDoAdapter(Context context, List<ToDoFirebase> toDos, boolean click, ProjectFirebase project) {
         this.context = context;
         this.toDos = toDos;
         this.click = click;
@@ -101,8 +102,8 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
                 return;
             }
             final Intent intentProject = new Intent(context, EditToDoProject.class);
-            intentProject.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
-            intentProject.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+            intentProject.putExtra(ToDoFirebase.class.getSimpleName(), toDo);
+            intentProject.putExtra(ProjectFirebase.class.getSimpleName(), project);
             context.startActivity(intentProject);
         }
     }

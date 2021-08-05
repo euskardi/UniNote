@@ -13,14 +13,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.uninote.R;
+import com.example.uninote.models.ProjectFirebase;
+import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.ToDoFirebase;
 import com.example.uninote.toDo.EditToDo;
 import com.example.uninote.toDo.ToDoAdapter;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.ToDo;
 import com.example.uninote.toDo.ToDoDetailActivity;
 import com.example.uninote.toDo.ToDoDetailProject;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -42,7 +52,10 @@ public class ToDoProjectFragment extends ToDoFragment {
     private LinearLayoutManager mLayoutManager;
     private ImageButton btnAdd;
     private ToDoAdapter adapter;
-    private List<ToDo> allToDos;
+    private List<ToDoFirebase> allToDos;
+
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
+
 
     public ToDoProjectFragment() {
     }
@@ -65,7 +78,7 @@ public class ToDoProjectFragment extends ToDoFragment {
 
         rvToDos = view.findViewById(R.id.rvToDos);
         allToDos = new ArrayList<>();
-        //adapter = new ToDoAdapter(getContext(), allToDos, userType, getArguments().getParcelable("code"));
+        adapter = new ToDoAdapter(getContext(), allToDos, userType, getArguments().getParcelable("code"));
         rvToDos.setAdapter(adapter);
         mLayoutManager = new LinearLayoutManager(getContext());
         rvToDos.setLayoutManager(mLayoutManager);
@@ -84,9 +97,9 @@ public class ToDoProjectFragment extends ToDoFragment {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Project project = getArguments().getParcelable("code");
+                final ProjectFirebase project = getArguments().getParcelable("code");
                 final Intent intent = new Intent(getContext(), ToDoDetailProject.class);
-                intent.putExtra(Project.class.getSimpleName(), Parcels.wrap(project));
+                intent.putExtra(ProjectFirebase.class.getSimpleName(), project);
                 getContext().startActivity(intent);
             }
         });
@@ -95,38 +108,29 @@ public class ToDoProjectFragment extends ToDoFragment {
     }
 
     private boolean viewType() {
-        final Project project = getArguments().getParcelable("code");
-
-        final ParseQuery<ParseUser> innerQueryOne = ParseQuery.getQuery("_User");
-        innerQueryOne.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
-        final ParseQuery<ParseUser> innerQueryTwo = ParseQuery.getQuery("Project");
-        innerQueryTwo.whereEqualTo("objectId", project.getObjectId());
-
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Project");
-        query.whereMatchesQuery("username", innerQueryOne);
-        query.whereMatchesQuery("project", innerQueryTwo);
-
-        try {
-            ParseObject object = query.getFirst();
-            return object.getBoolean("type");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        if (project.getEditor().equals(ParseUser.getCurrentUser().getUsername())) return true;
         return false;
     }
 
     private void queryToDos() {
-        final Project project = getArguments().getParcelable("code");
-        final ParseQuery<ParseUser> innerQuery = ParseQuery.getQuery("Project");
-        innerQuery.whereEqualTo("objectId", project.getObjectId());
-        final ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
-        query.whereMatchesQuery("Project", innerQuery);
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        final Query query = FirebaseDatabase.getInstance().getReference("ToDos")
+                .orderByChild("project")
+                .equalTo(project.getName());
 
-        query.findInBackground(new FindCallback<ToDo>() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ToDo> toDos, ParseException e) {
-                allToDos.addAll(toDos);
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    allToDos.add(dataSnapshot.getValue(ToDoFirebase.class));
+                }
                 adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Internet Connection Error", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -9,7 +9,7 @@ public class ToDoFirebase implements Parcelable {
     private String title;
     private String description;
     private String url;
-
+    private String project;
 
     public ToDoFirebase() {
     }
@@ -70,6 +70,14 @@ public class ToDoFirebase implements Parcelable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
     }
 
     @Override
