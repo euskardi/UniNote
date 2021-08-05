@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">UniNote</string>
     <string name="password">password</string>
-    <string name="username">username</string>
+    <string name="username">e-mail</string>
     <string name="login">Login</string>
     <string name="log_out">Log Out</string>
     <string name="take_picture">Take Picture</string>

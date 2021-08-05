@@ -14,13 +14,21 @@
         android:layout_height="52dp"
         android:layout_weight="3"
         android:fontFamily="sans-serif-black"
-        android:text="UniNote"
+        android:text="Sign Up"
         android:textAlignment="center"
         android:textSize="34sp"
         android:typeface="sans" />
 
     <EditText
         android:id="@+id/etUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="username"/>
+
+    <EditText
+        android:id="@+id/etEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -38,22 +46,12 @@
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:backgroundTint="#62DEED"
-        android:text="@string/login"
-        android:textColor="@android:color/black"
-        app:cornerRadius="100dp" />
-
-    <Button
         android:id="@+id/btnSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:backgroundTint="#5EDF63"
-        android:text="Sign Up"
+        android:text="Create"
         android:textColor="@android:color/black"
         app:cornerRadius="100dp" />
 

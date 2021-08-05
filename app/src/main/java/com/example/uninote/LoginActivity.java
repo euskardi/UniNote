@@ -8,9 +8,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.uninote.MainActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -20,20 +25,19 @@ public class LoginActivity extends AppCompatActivity {
 
     public static final String TAG = "LoginActivity";
 
-    private EditText etUsername;
+    private EditText etEmail;
     private EditText etPassword;
     private Button btnLogin;
     private Button btnSignUp;
+
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        if (ParseUser.getCurrentUser() != null) {
-            goMainActivity();
-        }
 
-        etUsername = findViewById(R.id.etUsername);
+        etEmail = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
@@ -41,45 +45,35 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(TAG, "onClick login button");
-                loginUser(etUsername.getText().toString(), etPassword.getText().toString());
+                final String email = etEmail.getText().toString();
+                final String password = etPassword.getText().toString();
+
+                if (email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Missing fields", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                loginUser(email, password);
             }
         });
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signUpUser(etUsername.getText().toString(), etPassword.getText().toString());
-            }
-        });
-    }
-
-    private void signUpUser(String username, String password) {
-        final ParseUser user = new ParseUser();
-
-        user.setUsername(username);
-        user.setPassword(password);
-        user.signUpInBackground(new SignUpCallback() {
-            public void done(ParseException e) {
-                if (e != null) {
-                    Toast.makeText(LoginActivity.this, "Issue with Sign Up!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Toast.makeText(LoginActivity.this, "Sign Up Successfully", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+                finish();
             }
         });
     }
 
     private void loginUser(String username, String password) {
-        Log.i(TAG, "Attempting to login user " + username);
-        ParseUser.logInInBackground(username, password, new LogInCallback() {
+
+        firebaseAuth.signInWithEmailAndPassword(username, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
-            public void done(ParseUser user, ParseException e) {
-                if (e != null) {
-                    Toast.makeText(LoginActivity.this, "Issue with login!", Toast.LENGTH_SHORT).show();
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (!task.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Password or Email wrong", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
                 goMainActivity();
             }
         });
@@ -88,5 +82,13 @@ public class LoginActivity extends AppCompatActivity {
     private void goMainActivity() {
         startActivity(new Intent(this, MainActivity.class));
         finish();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (firebaseAuth.getCurrentUser() != null) {
+            goMainActivity();
+        }
     }
 }
