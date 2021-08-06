@@ -145,7 +145,7 @@ public class PhotoTaken extends AppCompatActivity {
                 });
     }
 
-    public void updateToDo(String title, String description, ParseUser currentUser, File photoFile, ToDoFirebase toDo, Context context) {
+    public void updateToDo(String title, String description, File photoFile, ToDoFirebase toDo, Context context) {
         final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
         final HashMap hashMap = new HashMap();

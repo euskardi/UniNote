@@ -25,6 +25,7 @@ import com.example.uninote.models.UserHasToDo;
 import com.example.uninote.toDo.ToDoDetailActivity;
 import com.example.uninote.models.ToDo;
 import com.example.uninote.toDo.ToDoAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,7 +54,7 @@ public class ToDoFragment extends Fragment {
     private List<ToDoFirebase> allToDos;
 
     private DatabaseReference reference;
-
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     public ToDoFragment() {
     }
@@ -101,7 +102,7 @@ public class ToDoFragment extends Fragment {
     private void queryToDos() {
         final Query query = FirebaseDatabase.getInstance().getReference("UserHasToDo")
                 .orderByChild("user")
-                .equalTo(ParseUser.getCurrentUser().getUsername());
+                .equalTo(firebaseAuth.getUid());
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -110,7 +111,7 @@ public class ToDoFragment extends Fragment {
 
                     final UserHasToDo userHasToDo = dataSnapshot.getValue(UserHasToDo.class);
                     final Query innerQuery = FirebaseDatabase.getInstance().getReference("ToDos")
-                            .orderByKey()
+                            .orderByChild("id")
                             .equalTo(userHasToDo.getToDo());
 
                     innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {

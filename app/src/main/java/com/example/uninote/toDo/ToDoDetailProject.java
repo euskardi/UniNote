@@ -93,8 +93,7 @@ public class ToDoDetailProject extends PhotoTaken {
                     Toast.makeText(ToDoDetailProject.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final ParseUser currentUser = ParseUser.getCurrentUser();
-                saveToDo(title, description, currentUser, photoFile, project.getName());
+                saveToDo(title, description, photoFile, project.getName());
             }
         });
 
@@ -107,7 +106,7 @@ public class ToDoDetailProject extends PhotoTaken {
 
     }
 
-    private void saveToDo(String title, String description, ParseUser currentUser, File photoFile, String name) {
+    private void saveToDo(String title, String description, File photoFile, String name) {
         toDoFirebase.setTitle(title);
         toDoFirebase.setDescription(description);
         toDoFirebase.setId(title);

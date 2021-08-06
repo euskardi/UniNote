@@ -93,9 +93,7 @@ public class EditToDoProject extends PhotoTaken {
                     Toast.makeText(EditToDoProject.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final ParseUser currentUser = ParseUser.getCurrentUser();
-
-                updateToDo(title, description, currentUser, photoFile, toDo, EditToDoProject.this);
+                updateToDo(title, description, photoFile, toDo, EditToDoProject.this);
             }
         });
 

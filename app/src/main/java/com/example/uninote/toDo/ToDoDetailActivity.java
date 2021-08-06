@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 
 import com.example.uninote.MainActivity;
 import com.example.uninote.R;
+import com.example.uninote.models.GeneratorId;
 import com.example.uninote.models.PhotoTaken;
 import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
@@ -25,6 +26,7 @@ import com.example.uninote.models.UserHasToDo;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -58,6 +60,7 @@ public class ToDoDetailActivity extends PhotoTaken {
     private StorageReference storageReference;
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +99,7 @@ public class ToDoDetailActivity extends PhotoTaken {
                     Toast.makeText(ToDoDetailActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final ParseUser currentUser = ParseUser.getCurrentUser();
-                saveToDo(title, description, currentUser, photoFile);
+                saveToDo(title, description, photoFile);
             }
         });
 
@@ -112,7 +114,7 @@ public class ToDoDetailActivity extends PhotoTaken {
 
     private void linkToDo(String code) {
         final ParseObject entity = new ParseObject("User_ToDo");
-        entity.put("username", ParseUser.getCurrentUser());
+        entity.put("username", firebaseAuth.getUid());
 
         ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
         query.getInBackground(code, (object, e) -> {
@@ -138,13 +140,15 @@ public class ToDoDetailActivity extends PhotoTaken {
     }
 
 
-    private void saveToDo(String title, String description, ParseUser currentUser, File photoFile) {
-        final UserHasToDo userHasToDo = new UserHasToDo(currentUser.getUsername(), title);
+    private void saveToDo(String title, String description, File photoFile) {
+
+        final String id = GeneratorId.get();
+        final UserHasToDo userHasToDo = new UserHasToDo(firebaseAuth.getUid(), id);
         final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
         toDoFirebase.setTitle(title);
         toDoFirebase.setDescription(description);
-        toDoFirebase.setId(title);
+        toDoFirebase.setId(id);
         if (photoFile != null) uploadImage(ToDoDetailActivity.this);
 
         rootNode = FirebaseDatabase.getInstance();
@@ -153,9 +157,9 @@ public class ToDoDetailActivity extends PhotoTaken {
             @Override
             public void run() {
                 reference = rootNode.getReference("ToDos");
-                reference.child(toDoFirebase.getTitle()).setValue(toDoFirebase);
+                reference.child(id).setValue(toDoFirebase);
                 reference = rootNode.getReference("UserHasToDo");
-                reference.child(ISO_8601_FORMAT.format(new Date())).setValue(userHasToDo);
+                reference.child(UUID.randomUUID().toString()).setValue(userHasToDo);
             }
         };
 
