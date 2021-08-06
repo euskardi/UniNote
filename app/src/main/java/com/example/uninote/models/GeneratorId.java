@@ -1,7 +1,5 @@
 package com.example.uninote.models;
 
-import org.apache.commons.text.RandomStringGenerator;
-
 import java.util.Random;
 
 public class GeneratorId {

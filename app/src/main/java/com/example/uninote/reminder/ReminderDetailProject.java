@@ -1,43 +1,23 @@
 package com.example.uninote.reminder;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.example.uninote.MainActivity;
-import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.GeneratorId;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.parse.ParseACL;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -45,10 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
 
 public class ReminderDetailProject extends ButtonsReminder {
 
@@ -67,7 +44,6 @@ public class ReminderDetailProject extends ButtonsReminder {
     private Button btnCreateReminder;
     private DatePickerDialog.OnDateSetListener setListener;
     private int hour, minutes;
-    private Reminder reminder;
     private ProjectFirebase project;
 
     private FirebaseDatabase rootNode;

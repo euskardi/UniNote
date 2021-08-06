@@ -1,10 +1,7 @@
 package com.example.uninote.toDo;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,62 +9,30 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
-import com.example.uninote.MainActivity;
-import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.GeneratorId;
 import com.example.uninote.models.PhotoTaken;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.ToDo;
-import com.example.uninote.models.ToDoFirebase;
-import com.example.uninote.models.UserHasToDo;
-import com.example.uninote.reminder.ReminderDetailProject;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.parse.ParseACL;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import org.parceler.Parcels;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.UUID;
 
 public class ToDoDetailProject extends PhotoTaken {
 
     public static final String TAG = "ToDoUpload";
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
     private EditText etTitle;
     private EditText etDescription;
     private ImageView ivPostImage;
     private Button btnSubmit;
     private ProjectFirebase project;
-
     private FirebaseStorage storage;
     private StorageReference storageReference;
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
-    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

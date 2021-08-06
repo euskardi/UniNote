@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,8 +20,6 @@ import androidx.core.content.FileProvider;
 
 import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
-import com.example.uninote.toDo.EditToDo;
-import com.example.uninote.toDo.EditToDoProject;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -35,10 +32,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.parse.ParseUser;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -47,15 +42,14 @@ public class PhotoTaken extends AppCompatActivity {
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     public static final String photoFileName = "photo.jpg";
     public static final String TAG = "Camara";
+    public final ToDoFirebase toDoFirebase = new ToDoFirebase();
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
     public File photoFile;
     public Bitmap takenImage;
     public ImageView ivPostImage;
     public Uri fileProvider;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
-    public final ToDoFirebase toDoFirebase = new ToDoFirebase();
-
 
     public void launchCamera() {
         ivPostImage = findViewById(R.id.ivImageToDo);

@@ -13,15 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.uninote.R;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.ToDo;
 import com.example.uninote.models.ToDoFirebase;
-import com.parse.ParseFile;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
 
 import java.util.List;
 

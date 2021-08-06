@@ -6,27 +6,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.uninote.fragments.MessageFragment;
 import com.example.uninote.fragments.ProfileFragment;
-import com.example.uninote.fragments.ProjectFragment;
-import com.example.uninote.fragments.ReminderFragment;
 import com.example.uninote.fragments.ReminderProjectFragment;
 import com.example.uninote.fragments.ShareFragment;
-import com.example.uninote.fragments.ToDoFragment;
 import com.example.uninote.fragments.ToDoProjectFragment;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.ToDo;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.parse.ParseACL;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
-
-import org.parceler.Parcels;
 
 public class ProjectActivity extends AppCompatActivity {
 

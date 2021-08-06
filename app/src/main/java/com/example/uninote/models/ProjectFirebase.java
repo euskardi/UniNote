@@ -5,6 +5,17 @@ import android.os.Parcelable;
 
 public class ProjectFirebase implements Parcelable {
 
+    public static final Creator<ProjectFirebase> CREATOR = new Creator<ProjectFirebase>() {
+        @Override
+        public ProjectFirebase createFromParcel(Parcel in) {
+            return new ProjectFirebase(in);
+        }
+
+        @Override
+        public ProjectFirebase[] newArray(int size) {
+            return new ProjectFirebase[size];
+        }
+    };
     private String id;
     private String name;
     private String description;
@@ -32,18 +43,6 @@ public class ProjectFirebase implements Parcelable {
         countReminders = in.readInt();
         countTodos = in.readInt();
     }
-
-    public static final Creator<ProjectFirebase> CREATOR = new Creator<ProjectFirebase>() {
-        @Override
-        public ProjectFirebase createFromParcel(Parcel in) {
-            return new ProjectFirebase(in);
-        }
-
-        @Override
-        public ProjectFirebase[] newArray(int size) {
-            return new ProjectFirebase[size];
-        }
-    };
 
     public String getId() {
         return id;

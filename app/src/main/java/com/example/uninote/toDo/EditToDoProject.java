@@ -1,7 +1,5 @@
 package com.example.uninote.toDo;
 
-import androidx.annotation.NonNull;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,40 +12,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.bumptech.glide.Glide;
-import com.example.uninote.MainActivity;
 import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
-import com.example.uninote.ShareContent;
 import com.example.uninote.models.PhotoTaken;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.ToDo;
 import com.example.uninote.models.ToDoFirebase;
-import com.example.uninote.reminder.EditReminderProject;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.parse.DeleteCallback;
-import com.parse.FindCallback;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
 
 public class EditToDoProject extends PhotoTaken {
 
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
     private TextView tvName;
     private EditText etTitle;
     private EditText etDescription;
@@ -56,8 +36,6 @@ public class EditToDoProject extends PhotoTaken {
     private Button btnSubmit;
     private ToDoFirebase toDo;
     private ProjectFirebase project;
-    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

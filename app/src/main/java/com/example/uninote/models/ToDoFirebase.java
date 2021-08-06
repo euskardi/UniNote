@@ -5,6 +5,17 @@ import android.os.Parcelable;
 
 public class ToDoFirebase implements Parcelable {
 
+    public static final Creator<ToDoFirebase> CREATOR = new Creator<ToDoFirebase>() {
+        @Override
+        public ToDoFirebase createFromParcel(Parcel in) {
+            return new ToDoFirebase(in);
+        }
+
+        @Override
+        public ToDoFirebase[] newArray(int size) {
+            return new ToDoFirebase[size];
+        }
+    };
     private String id;
     private String title;
     private String description;
@@ -27,18 +38,6 @@ public class ToDoFirebase implements Parcelable {
         description = in.readString();
         url = in.readString();
     }
-
-    public static final Creator<ToDoFirebase> CREATOR = new Creator<ToDoFirebase>() {
-        @Override
-        public ToDoFirebase createFromParcel(Parcel in) {
-            return new ToDoFirebase(in);
-        }
-
-        @Override
-        public ToDoFirebase[] newArray(int size) {
-            return new ToDoFirebase[size];
-        }
-    };
 
     public String getId() {
         return id;

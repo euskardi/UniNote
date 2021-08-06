@@ -13,14 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.uninote.R;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
-import com.parse.ParseGeoPoint;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.ParseException;

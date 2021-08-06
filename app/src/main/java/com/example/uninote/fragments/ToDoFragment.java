@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +17,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.uninote.R;
-import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDoFirebase;
-import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.models.UserHasToDo;
 import com.example.uninote.toDo.ToDoDetailActivity;
-import com.example.uninote.models.ToDo;
 import com.example.uninote.toDo.ToDoAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,11 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
 

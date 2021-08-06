@@ -5,6 +5,17 @@ import android.os.Parcelable;
 
 public class ReminderFirebase implements Parcelable {
 
+    public static final Creator<ReminderFirebase> CREATOR = new Creator<ReminderFirebase>() {
+        @Override
+        public ReminderFirebase createFromParcel(Parcel in) {
+            return new ReminderFirebase(in);
+        }
+
+        @Override
+        public ReminderFirebase[] newArray(int size) {
+            return new ReminderFirebase[size];
+        }
+    };
     private String id;
     private String title;
     private String date;
@@ -31,18 +42,6 @@ public class ReminderFirebase implements Parcelable {
         latitude = in.readDouble();
         longitude = in.readDouble();
     }
-
-    public static final Creator<ReminderFirebase> CREATOR = new Creator<ReminderFirebase>() {
-        @Override
-        public ReminderFirebase createFromParcel(Parcel in) {
-            return new ReminderFirebase(in);
-        }
-
-        @Override
-        public ReminderFirebase[] newArray(int size) {
-            return new ReminderFirebase[size];
-        }
-    };
 
     public String getId() {
         return id;

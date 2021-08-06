@@ -1,10 +1,8 @@
 package com.example.uninote.toDo;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,42 +10,25 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.example.uninote.MainActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.GeneratorId;
 import com.example.uninote.models.PhotoTaken;
-import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.ToDo;
-import com.example.uninote.models.ToDoFirebase;
-import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.models.UserHasToDo;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.parse.ParseACL;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
 
 public class ToDoDetailActivity extends PhotoTaken {
 
     public static final String TAG = "ToDoUpload";
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private EditText etTitle;
     private EditText etDescription;
     private EditText etShareCode;
@@ -55,12 +36,10 @@ public class ToDoDetailActivity extends PhotoTaken {
     private ImageView ivPostImage;
     private Button btnSubmit;
     private Button btnShare;
-
     private FirebaseStorage storage;
     private StorageReference storageReference;
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
-    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

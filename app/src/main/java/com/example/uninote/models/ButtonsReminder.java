@@ -19,9 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
-import com.example.uninote.reminder.EditReminder;
-import com.example.uninote.reminder.ReminderDetailProject;
-import com.example.uninote.toDo.EditToDoProject;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,7 +26,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.parse.ParseUser;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -40,6 +36,7 @@ import java.util.List;
 
 public class ButtonsReminder extends AppCompatActivity {
     public static final String TAG = "ReminderActivity";
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
     private EditText etTitle;
     private EditText etInputDate;
     private EditText etInputHour;
@@ -49,14 +46,12 @@ public class ButtonsReminder extends AppCompatActivity {
     private ImageButton btnUbication;
     private Button btnCreateReminder;
     private DatePickerDialog.OnDateSetListener setListener;
-    private Calendar calendar = Calendar.getInstance();
+    private final Calendar calendar = Calendar.getInstance();
     private final int year = calendar.get(Calendar.YEAR);
     private final int month = calendar.get(Calendar.MONTH);
     private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private final int hour = calendar.get(Calendar.HOUR);
     private final int minutes = calendar.get(Calendar.MINUTE);
-    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
-
 
     public void settingButtons(Context context) {
         etTitle = findViewById(R.id.etInputTitle);

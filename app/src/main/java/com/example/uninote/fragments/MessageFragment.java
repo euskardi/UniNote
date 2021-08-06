@@ -1,7 +1,6 @@
 package com.example.uninote.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +18,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.uninote.MessageAdapter;
 import com.example.uninote.R;
-import com.example.uninote.models.Message;
 import com.example.uninote.models.MessageFirebase;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.UserFirebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,11 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,13 +35,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class MessageFragment extends Fragment {
 
-    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
     public static final String TAG = "Chat";
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
+    private final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView rvMessages;
     private LinearLayout mLayoutManager;
@@ -59,7 +49,6 @@ public class MessageFragment extends Fragment {
     private ParseUser message;
     private EditText etMessage;
     private Button btnSend;
-
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
 

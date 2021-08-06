@@ -18,13 +18,8 @@ import android.widget.Toast;
 import com.example.uninote.R;
 import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.reminder.EditReminder;
 import com.example.uninote.reminder.ReminderAdapter;
-import com.example.uninote.models.Project;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.reminder.ReminderDetailProject;
-import com.example.uninote.toDo.ToDoDetailProject;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,17 +27,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 

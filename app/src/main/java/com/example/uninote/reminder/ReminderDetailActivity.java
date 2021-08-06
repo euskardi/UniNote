@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,14 +14,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.example.uninote.MainActivity;
-import com.example.uninote.ProjectDetailActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.GeneratorId;
-import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.UserHasProject;
 import com.example.uninote.models.UserHasReminder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -32,9 +27,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.SaveCallback;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -44,9 +36,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.RandomStringGenerator;
 
 
 public class ReminderDetailActivity extends ButtonsReminder {
@@ -68,7 +57,6 @@ public class ReminderDetailActivity extends ButtonsReminder {
     private Button btnShare;
     private DatePickerDialog.OnDateSetListener setListener;
     private int hour, minutes;
-    private Reminder reminder;
 
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;

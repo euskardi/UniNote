@@ -1,13 +1,10 @@
 package com.example.uninote.reminder;
 
-import androidx.annotation.NonNull;
-
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,31 +13,18 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.uninote.MainActivity;
+import androidx.annotation.NonNull;
+
 import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
-import com.example.uninote.ShareContent;
 import com.example.uninote.models.ButtonsReminder;
-import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
-import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.parse.DeleteCallback;
-import com.parse.FindCallback;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -48,12 +32,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class EditReminderProject extends ButtonsReminder {
 
     public static final String TAG = "ReminderActivity";
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
     private EditText etTitle;
     private EditText etInputDate;
     private EditText etInputHour;
@@ -63,15 +47,13 @@ public class EditReminderProject extends ButtonsReminder {
     private ImageButton btnUbication;
     private Button btnCreateReminder;
     private DatePickerDialog.OnDateSetListener setListener;
-    private Calendar calendar = Calendar.getInstance();
+    private final Calendar calendar = Calendar.getInstance();
     private final int year = calendar.get(Calendar.YEAR);
     private final int month = calendar.get(Calendar.MONTH);
     private final int day = calendar.get(Calendar.DAY_OF_MONTH);
     private int hour, minutes;
     private ReminderFirebase reminder;
     private ProjectFirebase project;
-    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

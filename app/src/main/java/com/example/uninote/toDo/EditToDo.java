@@ -1,12 +1,7 @@
 package com.example.uninote.toDo;
 
-import androidx.annotation.NonNull;
-
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,18 +12,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
+import androidx.annotation.NonNull;
+
 import com.example.uninote.MainActivity;
 import com.example.uninote.R;
 import com.example.uninote.ShareContent;
 import com.example.uninote.models.PhotoTaken;
-import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.ToDo;
 import com.example.uninote.models.ToDoFirebase;
-import com.example.uninote.reminder.EditReminder;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,23 +27,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.parse.DeleteCallback;
-import com.parse.FindCallback;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
-import org.parceler.Parcels;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 
 public class EditToDo extends PhotoTaken {
 
@@ -128,7 +103,6 @@ public class EditToDo extends PhotoTaken {
         switch (item.getItemId()) {
             case R.id.share:
                 final Intent intent = new Intent(this, ShareContent.class);
-                intent.putExtra(ToDo.class.getSimpleName(), Parcels.wrap(toDo));
                 startActivity(intent);
                 finish();
                 return true;

@@ -11,12 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.uninote.models.Message;
 import com.example.uninote.models.MessageFirebase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseUser;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,12 +19,12 @@ import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
 
+    public static final String TAG = "RecyclerView";
     private static final int MESSAGE_ME = 1;
     private static final int MESSAGE_OTHER = 0;
-    public static final String TAG = "RecyclerView";
-    private  String firebaseAuth;
     private final Context context;
     private final List<MessageFirebase> messages;
+    private final String firebaseAuth;
 
     public MessageAdapter(String firebaseAuth, Context context, List<MessageFirebase> messages) {
         this.firebaseAuth = firebaseAuth;
@@ -39,10 +34,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-            final String messageUsername = messages.get(position).getSender();
-            if (messageUsername.equals(firebaseAuth)) {
-                return MESSAGE_ME;
-            }
+        final String messageUsername = messages.get(position).getSender();
+        if (messageUsername.equals(firebaseAuth)) {
+            return MESSAGE_ME;
+        }
         return MESSAGE_OTHER;
     }
 
@@ -85,7 +80,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         public void bind(MessageFirebase message) {
             tvMessage.setText(message.getContent());
-                tvName.setText(message.getUsername());
+            tvName.setText(message.getUsername());
 
             if (message.getImage() != null) {
                 Glide.with(context).load(message.getImage()).into(ivImage);
