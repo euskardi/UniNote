@@ -14,10 +14,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.uninote.R;
 import com.example.uninote.ShareAdapter;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
+import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.UserFirebase;
+import com.example.uninote.models.UserHasProject;
+import com.example.uninote.models.UserHasReminder;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -38,7 +49,7 @@ public class ShareFragment extends Fragment {
     private TextView tvWrite;
     private LinearLayoutManager mLayoutManager;
     private ShareAdapter adapter;
-    private List<ParseUser> allUsers;
+    private List<UserFirebase> allUsers;
 
     public ShareFragment() {
     }
@@ -72,31 +83,48 @@ public class ShareFragment extends Fragment {
             }
         });
 
-        final Project project = getArguments().getParcelable("code");
-        tvLecture.setText("Lecture Code: " + project.getObjectId() + "-0");
-        tvWrite.setText("Write Code: " + project.getObjectId() + "-1");
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        tvLecture.setText("Lecture Code: " + project.getId() + "-0");
+        tvWrite.setText("Write Code: " + project.getId() + "-1");
 
         queryProfiles();
     }
 
     private void queryProfiles() {
-        final Project project = getArguments().getParcelable("code");
-        final ParseQuery<Project> innerQuery = ParseQuery.getQuery("Project");
-        innerQuery.whereEqualTo("objectId", project.getObjectId());
-        final ParseQuery<ParseObject> query = ParseQuery.getQuery("User_Project");
-        query.whereMatchesQuery("project", innerQuery);
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        final Query query = FirebaseDatabase.getInstance().getReference("UserHasProject")
+                .orderByChild("project")
+                .equalTo(project.getId());
 
-        query.findInBackground(new FindCallback<ParseObject>() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ParseObject> users, ParseException e) {
-                for (ParseObject user : users) {
-                    try {
-                        allUsers.add(user.getParseUser("username").fetchIfNeeded());
-                    } catch (ParseException parseException) {
-                        parseException.printStackTrace();
-                    }
-                    adapter.notifyDataSetChanged();
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
+                    final UserHasProject userHasProject = dataSnapshot.getValue(UserHasProject.class);
+                    final Query innerQuery = FirebaseDatabase.getInstance().getReference("Users")
+                            .orderByKey()
+                            .equalTo(userHasProject.getUser());
+                    innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                allUsers.add(dataSnapshot.getValue(UserFirebase.class));
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error In Connection", Toast.LENGTH_SHORT).show();
             }
         });
     }

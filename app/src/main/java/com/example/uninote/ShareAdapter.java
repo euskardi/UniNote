@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.models.UserFirebase;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
@@ -24,9 +25,9 @@ import java.util.List;
 public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<ParseUser> users;
+    private final List<UserFirebase> users;
 
-    public ShareAdapter(Context context, List<ParseUser> users) {
+    public ShareAdapter(Context context, List<UserFirebase> users) {
         this.context = context;
         this.users = users;
     }
@@ -63,11 +64,10 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
             ivImage = itemView.findViewById(R.id.ivProfileFriend);
         }
 
-        public void bind(ParseUser parseUser) {
-            tvName.setText(parseUser.getUsername());
-            final ParseFile image = parseUser.getParseFile("picture");
-            if (image != null) {
-                Glide.with(context).load(parseUser.getParseFile("picture").getUrl()).into(ivImage);
+        public void bind(UserFirebase userFirebase) {
+            tvName.setText(userFirebase.getUsername());
+            if (userFirebase.getImage() != null) {
+                Glide.with(context).load(userFirebase.getImage()).into(ivImage);
             }
         }
     }

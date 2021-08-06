@@ -5,13 +5,15 @@ import android.os.Parcelable;
 
 public class ProjectFirebase implements Parcelable {
 
+    private String id;
     private String name;
     private String description;
     private String editor;
     private int countReminders;
     private int countTodos;
 
-    public ProjectFirebase(String name, String description, String editor, int countReminders, int countTodos) {
+    public ProjectFirebase(String id, String name, String description, String editor, int countReminders, int countTodos) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.editor = editor;
@@ -23,6 +25,7 @@ public class ProjectFirebase implements Parcelable {
     }
 
     protected ProjectFirebase(Parcel in) {
+        id = in.readString();
         name = in.readString();
         description = in.readString();
         editor = in.readString();
@@ -41,6 +44,14 @@ public class ProjectFirebase implements Parcelable {
             return new ProjectFirebase[size];
         }
     };
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -89,6 +100,7 @@ public class ProjectFirebase implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(name);
         dest.writeString(description);
         dest.writeString(editor);
