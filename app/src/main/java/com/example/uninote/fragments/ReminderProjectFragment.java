@@ -25,6 +25,7 @@ import com.example.uninote.models.Reminder;
 import com.example.uninote.reminder.ReminderDetailProject;
 import com.example.uninote.toDo.ToDoDetailProject;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,7 +55,7 @@ public class ReminderProjectFragment extends ReminderFragment {
     private ImageButton btnAdd;
     private ReminderAdapter adapter;
     private List<ReminderFirebase> allReminders;
-
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
     public ReminderProjectFragment() {
@@ -110,7 +111,7 @@ public class ReminderProjectFragment extends ReminderFragment {
 
     private boolean viewType() {
         final ProjectFirebase project = getArguments().getParcelable("code");
-        if (project.getEditor().equals(ParseUser.getCurrentUser().getUsername())) return true;
+        if (project.getEditor().equals(firebaseAuth.getUid())) return true;
         return false;
     }
 

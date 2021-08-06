@@ -10,9 +10,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.uninote.models.GeneratorId;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
+import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.models.UserHasProject;
+import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.toDo.ToDoDetailActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -21,14 +29,21 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.text.SimpleDateFormat;
+import java.util.UUID;
+
 public class ProjectDetailActivity extends AppCompatActivity {
 
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     public static final String TAG = "ProjectUpload";
     private EditText etTitle;
     private EditText etDescription;
     private EditText etShareCode;
     private Button btnSubmit;
     private Button btnShare;
+
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,53 +76,35 @@ public class ProjectDetailActivity extends AppCompatActivity {
                     Toast.makeText(ProjectDetailActivity.this, "Description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final ParseUser currentUser = ParseUser.getCurrentUser();
-                saveToDo(title, description, currentUser);
+                saveToDo(title, description);
             }
         });
     }
 
-    private void saveToDo(String title, String description, ParseUser currentUser) {
-        final Project project = new Project();
-        project.setTitle(title);
-        project.setDescription(description);
-        project.setEditor(currentUser);
+    private void saveToDo(String title, String description) {
 
-        project.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving", e);
-                    Toast.makeText(ProjectDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-                }
-                Log.i(TAG, "Project save was succesful!!");
-                etDescription.setText("");
-            }
-        });
+        final String id = GeneratorId.get();
+        final ProjectFirebase projectFirebase = new ProjectFirebase();
+        final UserHasProject userHasProject = new UserHasProject(firebaseAuth.getUid(), id, true);
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
-        final ParseObject entity = new ParseObject("User_Project");
-        final ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
-        parseACL.setPublicReadAccess(true);
-        ParseUser.getCurrentUser().setACL(parseACL);
+        projectFirebase.setName(title);
+        projectFirebase.setDescription(description);
+        projectFirebase.setEditor(firebaseAuth.getUid());
+        projectFirebase.setCountTodos(0);
+        projectFirebase.setCountReminders(0);
 
-        entity.put("username", currentUser);
-        entity.put("project", project);
-        entity.put("type", true);
+        rootNode = FirebaseDatabase.getInstance();
 
-        entity.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(com.parse.ParseException e) {
-                if (e == null) {
-                    Log.i(TAG, "Porject save was succesful!!");
-                    return;
-                }
-                Log.e(TAG, "Error while saving 2", e);
-                Toast.makeText(ProjectDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-            }
-        });
+        reference = rootNode.getReference("Project");
+        reference.child(id).setValue(projectFirebase);
+        reference = rootNode.getReference("UserHasProject");
+        reference.child(UUID.randomUUID().toString()).setValue(userHasProject);
 
         startActivity(new Intent(this, MainActivity.class));
         finish();
+
+
     }
 
     private void linkProject(String code) {
@@ -115,7 +112,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
         Log.i(TAG, parts[0] + " " + parts[1]);
         final ParseObject entity = new ParseObject("User_Project");
 
-        entity.put("username", ParseUser.getCurrentUser());
+        entity.put("username", firebaseAuth.getUid());
         entity.put("type", parts[1].equals("1"));
 
 

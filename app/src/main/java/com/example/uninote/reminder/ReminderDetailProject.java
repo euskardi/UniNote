@@ -18,6 +18,7 @@ import com.example.uninote.MainActivity;
 import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.ButtonsReminder;
+import com.example.uninote.models.GeneratorId;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.Reminder;
@@ -134,6 +135,7 @@ public class ReminderDetailProject extends ButtonsReminder {
 
     private void saveReminder(String title, Date date, ParseGeoPoint location, String projectName) {
 
+        final String id = GeneratorId.get();
         final ReminderFirebase reminderFirebase = new ReminderFirebase();
         final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
@@ -141,13 +143,13 @@ public class ReminderDetailProject extends ButtonsReminder {
         reminderFirebase.setDate(ISO_8601_FORMAT.format(date));
         reminderFirebase.setLatitude(location.getLatitude());
         reminderFirebase.setLongitude(location.getLongitude());
-        reminderFirebase.setId(title);
+        reminderFirebase.setId(id);
         reminderFirebase.setProject(projectName);
 
         rootNode = FirebaseDatabase.getInstance();
 
         reference = rootNode.getReference("Reminders");
-        reference.child(reminderFirebase.getTitle()).setValue(reminderFirebase);
+        reference.child(id).setValue(reminderFirebase);
         updateScore(true, project, ReminderDetailProject.this);
 
     }

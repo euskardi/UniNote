@@ -28,6 +28,7 @@ import com.example.uninote.models.UserHasProject;
 import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.reminder.ReminderDetailActivity;
 import com.example.uninote.reminder.ReminderDetailProject;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -48,6 +49,7 @@ import java.util.List;
 
 public class ProjectFragment extends Fragment {
 
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     public static final String TAG = "ProjectsFragment";
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView rvProjects;
@@ -101,7 +103,7 @@ public class ProjectFragment extends Fragment {
 
         final Query query = FirebaseDatabase.getInstance().getReference("UserHasProject")
                 .orderByChild("user")
-                .equalTo(ParseUser.getCurrentUser().getUsername());
+                .equalTo(firebaseAuth.getUid());
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

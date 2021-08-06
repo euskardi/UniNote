@@ -25,6 +25,7 @@ import com.example.uninote.models.Project;
 import com.example.uninote.models.ToDo;
 import com.example.uninote.toDo.ToDoDetailActivity;
 import com.example.uninote.toDo.ToDoDetailProject;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,8 +55,8 @@ public class ToDoProjectFragment extends ToDoFragment {
     private ToDoAdapter adapter;
     private List<ToDoFirebase> allToDos;
 
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
-
 
     public ToDoProjectFragment() {
     }
@@ -109,7 +110,7 @@ public class ToDoProjectFragment extends ToDoFragment {
 
     private boolean viewType() {
         final ProjectFirebase project = getArguments().getParcelable("code");
-        if (project.getEditor().equals(ParseUser.getCurrentUser().getUsername())) return true;
+        if (project.getEditor().equals(firebaseAuth.getUid())) return true;
         return false;
     }
 

@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import com.example.uninote.MainActivity;
 import com.example.uninote.ProjectActivity;
 import com.example.uninote.R;
+import com.example.uninote.models.GeneratorId;
 import com.example.uninote.models.PhotoTaken;
 import com.example.uninote.models.Project;
 import com.example.uninote.models.ProjectFirebase;
@@ -107,9 +108,11 @@ public class ToDoDetailProject extends PhotoTaken {
     }
 
     private void saveToDo(String title, String description, File photoFile, String name) {
+        final String id = GeneratorId.get();
+
         toDoFirebase.setTitle(title);
         toDoFirebase.setDescription(description);
-        toDoFirebase.setId(title);
+        toDoFirebase.setId(id);
         toDoFirebase.setProject(name);
         if (photoFile != null) uploadImage(ToDoDetailProject.this);
 
@@ -119,7 +122,7 @@ public class ToDoDetailProject extends PhotoTaken {
             @Override
             public void run() {
                 reference = rootNode.getReference("ToDos");
-                reference.child(toDoFirebase.getTitle()).setValue(toDoFirebase);
+                reference.child(id).setValue(toDoFirebase);
             }
         };
 

@@ -155,6 +155,7 @@ public class ButtonsReminder extends AppCompatActivity {
     public void updateScore(Boolean type, ProjectFirebase project, Context context) {
         final Intent intentProject = new Intent(context, ProjectActivity.class);
         intentProject.putExtra(ProjectFirebase.class.getSimpleName(), project);
+
         final HashMap hashMap = new HashMap();
         final int count = type ? 1 : -1;
         project.setCountReminders(project.getCountReminders() + count);
