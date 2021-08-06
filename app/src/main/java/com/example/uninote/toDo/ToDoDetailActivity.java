@@ -67,7 +67,6 @@ public class ToDoDetailActivity extends PhotoTaken {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_detail);
 
-        findViewById(R.id.shareToDo).setVisibility(View.VISIBLE);
         etTitle = findViewById(R.id.etInputTitleToDo);
         etDescription = findViewById(R.id.etInputDescription);
         etShareCode = findViewById(R.id.etShareCodeToDo);
@@ -79,16 +78,6 @@ public class ToDoDetailActivity extends PhotoTaken {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        btnShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (etShareCode.getText().toString().isEmpty()) {
-                    Toast.makeText(ToDoDetailActivity.this, "Empty Code", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                linkToDo(etShareCode.getText().toString());
-            }
-        });
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,34 +100,6 @@ public class ToDoDetailActivity extends PhotoTaken {
         });
 
     }
-
-    private void linkToDo(String code) {
-        final ParseObject entity = new ParseObject("User_ToDo");
-        entity.put("username", firebaseAuth.getUid());
-
-        ParseQuery<ToDo> query = ParseQuery.getQuery("ToDo");
-        query.getInBackground(code, (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            entity.put("toDo", object);
-            entity.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(com.parse.ParseException e) {
-                    if (e == null) {
-                        Log.i(TAG, "Link was successfully!!");
-                        return;
-                    }
-                    Log.e(TAG, "Error while saving 2", e);
-                    Toast.makeText(ToDoDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
-    }
-
 
     private void saveToDo(String title, String description, File photoFile) {
 

@@ -1,5 +1,6 @@
 package com.example.uninote;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -13,7 +14,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.uninote.models.Reminder;
+import com.example.uninote.models.ReminderFirebase;
 import com.example.uninote.models.ToDo;
+import com.example.uninote.models.UserFirebase;
+import com.example.uninote.models.UserHasReminder;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -27,20 +38,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ShareContent extends AppCompatActivity {
 
     public static final String TAG = "ShareContent";
     private final ArrayList<String> allUsers = new ArrayList<>();
-    private final Map<String, ParseUser> allParseUsers = new HashMap<String, ParseUser>();
+    private final Map<String, String> allParseUsers = new HashMap<String, String>();
     private AutoCompleteTextView autoCompleteTextView;
     private TextView tvShareCode;
     private TextView tvUserName;
     private ImageButton btnAddUser;
     private ArrayAdapter<String> adapter;
-    private ParseUser userInfo;
-    private Reminder reminder;
-    private ToDo toDo;
+    private String userInfo;
+    private ReminderFirebase reminder;
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +65,8 @@ public class ShareContent extends AppCompatActivity {
         tvUserName = findViewById(R.id.userId);
         btnAddUser = findViewById(R.id.btnAddUser);
 
-        toDo = Parcels.unwrap(getIntent().getParcelableExtra(ToDo.class.getSimpleName()));
-        reminder = Parcels.unwrap(getIntent().getParcelableExtra(Reminder.class.getSimpleName()));
-        if (toDo == null) {
-            tvShareCode.setText(reminder.getObjectId());
-        } else {
-            tvShareCode.setText(toDo.getObjectId());
-        }
+        reminder = getIntent().getParcelableExtra(ReminderFirebase.class.getSimpleName());
+        tvShareCode.setText(reminder.getId());
 
         gettingUsers();
 
@@ -83,46 +92,38 @@ public class ShareContent extends AppCompatActivity {
 
     private void addUser() {
         if (userInfo == null) {
-            Toast.makeText(this, "User can'' be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "User can't be empty", Toast.LENGTH_SHORT).show();
             return;
         }
-        final ParseObject entity = entityType();
-        entity.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Toast.makeText(ShareContent.this, "Error while saving", Toast.LENGTH_SHORT).show();
-                }
-                Toast.makeText(ShareContent.this, "File Added", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
-    private ParseObject entityType() {
-        if (toDo == null) {
-            final ParseObject entity = new ParseObject("User_Reminder");
-            entity.put("reminder", reminder);
-            entity.put("username", userInfo);
-            return entity;
-        }
-        final ParseObject entity = new ParseObject("User_ToDo");
-        entity.put("toDo", toDo);
-        entity.put("username", userInfo);
-        return entity;
+        rootNode = FirebaseDatabase.getInstance();
+
+        final UserHasReminder userHasReminder = new UserHasReminder(userInfo, reminder.getId());
+        reference = rootNode.getReference("UserHasReminder");
+        reference.child(UUID.randomUUID().toString()).setValue(userHasReminder);
+
+        Toast.makeText(this, "User added", Toast.LENGTH_SHORT).show();
+
+
     }
 
     private void gettingUsers() {
-        final ParseQuery<ParseUser> query = ParseQuery.getQuery("_User");
-        query.whereExists("objectId");
-        query.findInBackground(new FindCallback<ParseUser>() {
+
+        final Query query = FirebaseDatabase.getInstance().getReference("Users");
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<ParseUser> users, ParseException e) {
-                for (ParseUser user : users) {
-                    Log.i(TAG, "ToDo is good " + user.getUsername());
-                    allUsers.add(user.getUsername());
-                    allParseUsers.put(user.getUsername(), user);
+            public void onDataChange(@NonNull DataSnapshot snapshot2) {
+                for (DataSnapshot dataSnapshot : snapshot2.getChildren()) {
+                    allUsers.add(dataSnapshot.getValue(UserFirebase.class).getUsername());
+                    allParseUsers.put(dataSnapshot.getValue(UserFirebase.class).getUsername(), dataSnapshot.getKey());
                 }
                 adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ShareContent.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
             }
         });
     }

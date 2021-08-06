@@ -20,6 +20,7 @@ import com.example.uninote.MainActivity;
 import com.example.uninote.R;
 import com.example.uninote.ShareContent;
 import com.example.uninote.models.ButtonsReminder;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -163,7 +164,7 @@ public class EditReminder extends ButtonsReminder {
         switch (item.getItemId()) {
             case R.id.share:
                 final Intent intent = new Intent(this, ShareContent.class);
-                intent.putExtra(Reminder.class.getSimpleName(), Parcels.wrap(reminder));
+                intent.putExtra(ReminderFirebase.class.getSimpleName(), reminder);
                 startActivity(intent);
                 finish();
                 return true;

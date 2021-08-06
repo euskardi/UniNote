@@ -12,16 +12,25 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.example.uninote.MainActivity;
+import com.example.uninote.ProjectDetailActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.ButtonsReminder;
 import com.example.uninote.models.GeneratorId;
+import com.example.uninote.models.ProjectFirebase;
 import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.UserHasProject;
 import com.example.uninote.models.UserHasReminder;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -138,30 +147,33 @@ public class ReminderDetailActivity extends ButtonsReminder {
     }
 
     private void linkReminder(String code) {
-        final ParseObject entity = new ParseObject("User_Reminder");
-        entity.put("username", firebaseAuth.getUid());
 
-        ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
-        query.getInBackground(code, (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            entity.put("reminder", object);
-            entity.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(com.parse.ParseException e) {
-                    if (e == null) {
-                        Log.i(TAG, "Link was successfully!!");
-                        return;
-                    }
-                    Log.e(TAG, "Error while saving 2", e);
-                    Toast.makeText(ReminderDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+        rootNode = FirebaseDatabase.getInstance();
+        final UserHasReminder userHasReminder = new UserHasReminder();
+
+        userHasReminder.setUser(firebaseAuth.getUid());
+
+        final Query query = FirebaseDatabase.getInstance().getReference("Reminders")
+                .orderByKey()
+                .equalTo(code);
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    userHasReminder.setReminder(dataSnapshot.getValue(ReminderFirebase.class).getId());
+                    reference = rootNode.getReference("UserHasReminder");
+                    reference.child(UUID.randomUUID().toString()).setValue(userHasReminder);
                 }
-            });
+                startActivity(new Intent(ReminderDetailActivity.this, MainActivity.class));
+                finish();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ReminderDetailActivity.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
+            }
         });
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
     }
 
     private void saveReminder(String title, Date date, ParseGeoPoint location) {

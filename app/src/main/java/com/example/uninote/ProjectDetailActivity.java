@@ -1,5 +1,6 @@
 package com.example.uninote;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -19,8 +20,12 @@ import com.example.uninote.models.UserHasProject;
 import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.toDo.ToDoDetailActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -108,35 +113,33 @@ public class ProjectDetailActivity extends AppCompatActivity {
     }
 
     private void linkProject(String code) {
+        rootNode = FirebaseDatabase.getInstance();
         final String[] parts = code.split("-");
-        Log.i(TAG, parts[0] + " " + parts[1]);
-        final ParseObject entity = new ParseObject("User_Project");
+        final UserHasProject userHasProject = new UserHasProject();
 
-        entity.put("username", firebaseAuth.getUid());
-        entity.put("type", parts[1].equals("1"));
+        userHasProject.setUser(firebaseAuth.getUid());
+        userHasProject.setView(parts[1].equals("1"));
 
+        final Query query = FirebaseDatabase.getInstance().getReference("Project")
+                .orderByKey()
+                .equalTo(parts[0]);
 
-        ParseQuery<Project> query = ParseQuery.getQuery("Project");
-        query.getInBackground(parts[0], (object, e) -> {
-            if (e != null) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            entity.put("project", object);
-
-            entity.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(com.parse.ParseException e) {
-                    if (e == null) {
-                        Log.i(TAG, "Link was successfully!!");
-                        return;
-                    }
-                    Log.e(TAG, "Error while saving 2", e);
-                    Toast.makeText(ProjectDetailActivity.this, "Error while saving", Toast.LENGTH_SHORT).show();
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    userHasProject.setProject(dataSnapshot.getValue(ProjectFirebase.class).getId());
+                    reference = rootNode.getReference("UserHasProject");
+                    reference.child(UUID.randomUUID().toString()).setValue(userHasProject);
                 }
-            });
+                startActivity(new Intent(ProjectDetailActivity.this, MainActivity.class));
+                finish();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ProjectDetailActivity.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
+            }
         });
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
     }
 }
