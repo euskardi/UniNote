@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.uninote.models.Message;
+import com.example.uninote.models.MessageFirebase;
+import com.google.firebase.auth.FirebaseAuth;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -25,24 +27,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private static final int MESSAGE_ME = 1;
     private static final int MESSAGE_OTHER = 0;
     public static final String TAG = "RecyclerView";
+    private  String firebaseAuth;
     private final Context context;
-    private final List<Message> messages;
+    private final List<MessageFirebase> messages;
 
-    public MessageAdapter(Context context, List<Message> messages) {
+    public MessageAdapter(String firebaseAuth, Context context, List<MessageFirebase> messages) {
+        this.firebaseAuth = firebaseAuth;
         this.context = context;
         this.messages = messages;
     }
 
     @Override
     public int getItemViewType(int position) {
-        try {
-            final String messageUsername = messages.get(position).getSender().fetchIfNeeded().getUsername();
-            if (messageUsername.equals(ParseUser.getCurrentUser().getUsername())) {
+            final String messageUsername = messages.get(position).getSender();
+            if (messageUsername.equals(firebaseAuth)) {
                 return MESSAGE_ME;
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         return MESSAGE_OTHER;
     }
 
@@ -83,17 +83,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             ivImage = itemView.findViewById(R.id.ivImageMessage);
         }
 
-        public void bind(Message message) {
+        public void bind(MessageFirebase message) {
             tvMessage.setText(message.getContent());
-            try {
-                final String messageUsername = message.getSender().fetchIfNeeded().getUsername();
-                tvName.setText(messageUsername);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            final ParseFile image = message.getSender().getParseFile("picture");
-            if (image != null) {
-                Glide.with(context).load(image.getUrl()).into(ivImage);
+                tvName.setText(message.getUsername());
+
+            if (message.getImage() != null) {
+                Glide.with(context).load(message.getImage()).into(ivImage);
             }
         }
     }

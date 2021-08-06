@@ -20,7 +20,18 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.uninote.MessageAdapter;
 import com.example.uninote.R;
 import com.example.uninote.models.Message;
+import com.example.uninote.models.MessageFirebase;
 import com.example.uninote.models.Project;
+import com.example.uninote.models.ProjectFirebase;
+import com.example.uninote.models.ReminderFirebase;
+import com.example.uninote.models.UserFirebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -29,20 +40,28 @@ import com.parse.SaveCallback;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class MessageFragment extends Fragment {
 
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
     public static final String TAG = "Chat";
     private SwipeRefreshLayout swipeContainer;
     private RecyclerView rvMessages;
     private LinearLayout mLayoutManager;
     private MessageAdapter adapter;
-    private List<Message> allMessages;
+    private List<MessageFirebase> allMessages;
     private ParseUser message;
     private EditText etMessage;
     private Button btnSend;
+
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
 
 
     public MessageFragment() {
@@ -61,11 +80,22 @@ public class MessageFragment extends Fragment {
         etMessage = view.findViewById(R.id.etInputMessage);
         btnSend = view.findViewById(R.id.btnSend);
         allMessages = new ArrayList<>();
-        adapter = new MessageAdapter(getContext(), allMessages);
+        adapter = new MessageAdapter(firebaseAuth.getUid(), getContext(), allMessages);
         rvMessages.setAdapter(adapter);
         rvMessages.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        queryMessages();
+        rootDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                allMessages.clear();
+                queryMessages();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Internet Connection Error", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,42 +106,56 @@ public class MessageFragment extends Fragment {
     }
 
     private void sendMessage() {
-        final Project project = getArguments().getParcelable("code");
-        final Message newMessage = new Message();
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        final MessageFirebase newMessage = new MessageFirebase();
         newMessage.setContent(etMessage.getText().toString());
-        newMessage.setSender(ParseUser.getCurrentUser());
-        newMessage.setProject(project);
+        newMessage.setSender(firebaseAuth.getUid());
+        newMessage.setProject(project.getId());
 
-        allMessages.add(newMessage);
-        adapter.notifyItemChanged(allMessages.size() - 1);
-        etMessage.setText("");
-
-        newMessage.saveInBackground(new SaveCallback() {
+        rootDatabase.child("Users").child(firebaseAuth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    adapter.notifyDataSetChanged();
-                    return;
-                }
-                Log.e(TAG, "Error while saving", e);
-                Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_SHORT).show();
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                newMessage.setUsername(snapshot.child("username").getValue().toString());
+                newMessage.setImage(snapshot.child("image").getValue().toString());
+                allMessages.add(newMessage);
+                adapter.notifyItemChanged(allMessages.size() - 1);
+                etMessage.setText("");
+                uploadMessage(newMessage);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
 
-    private void queryMessages() {
-        final Project project = getArguments().getParcelable("code");
-        final ParseQuery<Message> conditionOne = ParseQuery.getQuery("Message");
-        conditionOne.whereEqualTo("project", project);
+    private void uploadMessage(MessageFirebase newMessage) {
+        final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
+        rootNode = FirebaseDatabase.getInstance();
+        reference = rootNode.getReference("Messages");
+        reference.child(ISO_8601_FORMAT.format(new Date())).setValue(newMessage);
+    }
 
-        conditionOne.findInBackground(new FindCallback<Message>() {
+    private void queryMessages() {
+        final ProjectFirebase project = getArguments().getParcelable("code");
+        final Query query = FirebaseDatabase.getInstance().getReference("Messages")
+                .orderByChild("project")
+                .equalTo(project.getId());
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void done(List<Message> objects, ParseException e) {
-                for (Message message : objects) {
-                    Log.i(TAG, "Message:" + message.getContent());
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    MessageFirebase messageFirebase = dataSnapshot.getValue(MessageFirebase.class);
+                    allMessages.add(messageFirebase);
                 }
-                allMessages.addAll(objects);
                 adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Internet Connection Error", Toast.LENGTH_SHORT).show();
             }
         });
     }
