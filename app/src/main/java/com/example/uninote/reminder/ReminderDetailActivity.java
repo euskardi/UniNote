@@ -15,17 +15,16 @@ import android.widget.Toast;
 import com.example.uninote.MainActivity;
 import com.example.uninote.R;
 import com.example.uninote.models.ButtonsReminder;
+import com.example.uninote.models.GeneratorId;
 import com.example.uninote.models.Reminder;
 import com.example.uninote.models.ReminderFirebase;
-import com.example.uninote.models.User;
 import com.example.uninote.models.UserHasReminder;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.parse.ParseACL;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.IOException;
@@ -34,8 +33,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.RandomStringGenerator;
+
 
 public class ReminderDetailActivity extends ButtonsReminder {
 
@@ -60,6 +63,8 @@ public class ReminderDetailActivity extends ButtonsReminder {
 
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,15 +132,14 @@ public class ReminderDetailActivity extends ButtonsReminder {
                     Toast.makeText(ReminderDetailActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final ParseUser currentUser = ParseUser.getCurrentUser();
-                saveReminder(title, currentUser, date, location);
+                saveReminder(title, date, location);
             }
         });
     }
 
     private void linkReminder(String code) {
         final ParseObject entity = new ParseObject("User_Reminder");
-        entity.put("username", ParseUser.getCurrentUser());
+        entity.put("username", firebaseAuth.getUid());
 
         ParseQuery<Reminder> query = ParseQuery.getQuery("Reminder");
         query.getInBackground(code, (object, e) -> {
@@ -160,24 +164,25 @@ public class ReminderDetailActivity extends ButtonsReminder {
         finish();
     }
 
-    private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location) {
+    private void saveReminder(String title, Date date, ParseGeoPoint location) {
 
+        final String id = GeneratorId.get();
         final ReminderFirebase reminderFirebase = new ReminderFirebase();
-        final UserHasReminder userHasReminder = new UserHasReminder(currentUser.getUsername(), title);
+        final UserHasReminder userHasReminder = new UserHasReminder(firebaseAuth.getUid(), id);
         final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
         reminderFirebase.setTitle(title);
         reminderFirebase.setDate(ISO_8601_FORMAT.format(date));
         reminderFirebase.setLatitude(location.getLatitude());
         reminderFirebase.setLongitude(location.getLongitude());
-        reminderFirebase.setId(title);
+        reminderFirebase.setId(id);
 
         rootNode = FirebaseDatabase.getInstance();
 
         reference = rootNode.getReference("Reminders");
-        reference.child(reminderFirebase.getTitle()).setValue(reminderFirebase);
+        reference.child(id).setValue(reminderFirebase);
         reference = rootNode.getReference("UserHasReminder");
-        reference.child(ISO_8601_FORMAT.format(new Date())).setValue(userHasReminder);
+        reference.child(UUID.randomUUID().toString()).setValue(userHasReminder);
 
         startActivity(new Intent(this, MainActivity.class));
         finish();

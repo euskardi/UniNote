@@ -127,13 +127,12 @@ public class ReminderDetailProject extends ButtonsReminder {
                     Toast.makeText(ReminderDetailProject.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                final ParseUser currentUser = ParseUser.getCurrentUser();
-                saveReminder(title, currentUser, date, location, project.getName());
+                saveReminder(title, date, location, project.getName());
             }
         });
     }
 
-    private void saveReminder(String title, ParseUser currentUser, Date date, ParseGeoPoint location, String projectName) {
+    private void saveReminder(String title, Date date, ParseGeoPoint location, String projectName) {
 
         final ReminderFirebase reminderFirebase = new ReminderFirebase();
         final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");

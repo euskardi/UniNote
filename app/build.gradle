@@ -71,4 +71,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
 
     implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'org.json:json:20180813'
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'org.apache.commons:commons-text:1.6'
 }

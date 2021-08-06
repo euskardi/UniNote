@@ -58,7 +58,6 @@ public class ButtonsReminder extends AppCompatActivity {
     private final DatabaseReference rootDatabase = FirebaseDatabase.getInstance().getReference();
 
 
-
     public void settingButtons(Context context) {
         etTitle = findViewById(R.id.etInputTitle);
         etInputDate = findViewById(R.id.etInputDate);
@@ -113,7 +112,7 @@ public class ButtonsReminder extends AppCompatActivity {
         });
     }
 
-    public void updateReminder(ReminderFirebase reminder,String title, Date date, List<Address> addresses, ParseUser currentUser, Context context) {
+    public void updateReminder(ReminderFirebase reminder, String title, Date date, List<Address> addresses, Context context) {
         final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sss'Z'");
 
         final HashMap hashMap = new HashMap();
@@ -157,7 +156,7 @@ public class ButtonsReminder extends AppCompatActivity {
         final Intent intentProject = new Intent(context, ProjectActivity.class);
         intentProject.putExtra(ProjectFirebase.class.getSimpleName(), project);
         final HashMap hashMap = new HashMap();
-        final int count = type ? 1 : - 1;
+        final int count = type ? 1 : -1;
         project.setCountReminders(project.getCountReminders() + count);
         hashMap.put("countReminders", project.getCountReminders());
 

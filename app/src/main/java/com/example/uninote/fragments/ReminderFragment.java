@@ -23,6 +23,7 @@ import com.example.uninote.models.UserHasReminder;
 import com.example.uninote.reminder.ReminderAdapter;
 import com.example.uninote.reminder.ReminderDetailActivity;
 import com.example.uninote.models.Reminder;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -50,6 +51,8 @@ public class ReminderFragment extends Fragment {
     private ImageButton btnAdd;
     private ReminderAdapter adapter;
     private List<ReminderFirebase> allReminders;
+
+    final private FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
     public ReminderFragment() {
     }
@@ -94,7 +97,7 @@ public class ReminderFragment extends Fragment {
     private void queryReminders() {
         final Query query = FirebaseDatabase.getInstance().getReference("UserHasReminder")
                 .orderByChild("user")
-                .equalTo(ParseUser.getCurrentUser().getUsername());
+                .equalTo(firebaseAuth.getUid());
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -103,9 +106,8 @@ public class ReminderFragment extends Fragment {
 
                     final UserHasReminder userHasReminder = dataSnapshot.getValue(UserHasReminder.class);
                     final Query innerQuery = FirebaseDatabase.getInstance().getReference("Reminders")
-                            .orderByKey()
+                            .orderByChild("id")
                             .equalTo(userHasReminder.getReminder());
-
                     innerQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {

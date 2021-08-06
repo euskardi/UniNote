@@ -147,8 +147,7 @@ public class EditReminder extends ButtonsReminder {
                     return;
                 }
 
-                final ParseUser currentUser = ParseUser.getCurrentUser();
-                updateReminder(reminder, title, date, addresses, currentUser, EditReminder.this);
+                updateReminder(reminder, title, date, addresses, EditReminder.this);
             }
         });
     }
